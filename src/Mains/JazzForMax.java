@@ -1,4 +1,5 @@
 package Mains;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -311,12 +312,12 @@ public class JazzForMax extends MaxObject
 	
 	public void loadJupiter(){
 		
-		ReadFile fileReader = new ReadFile("/Users/masonbretan/Desktop/dance of jupiter and venus/songScript109_4.txt");
+		ReadFile fileReader = new ReadFile("/Users/musictechnology/Documents/IntelliJ_Shimon/Songs/dance of jupiter and venus/songScript109_4.txt");
 		List<String> lines = new ArrayList<String>(fileReader.getLines());
 		instructions = fileReader.interpretScript(lines);
 		System.out.println("jupiter melody script loaded, instruction count = "+instructions.length);	
 		
-		fileReader = new ReadFile("/Users/masonbretan/Desktop/dance of jupiter and venus/improvScript.txt");
+		fileReader = new ReadFile("/Users/musictechnology/Documents/IntelliJ_Shimon/Songs/dance of jupiter and venus/improvScript.txt");
 		lines = new ArrayList<String>(fileReader.getLines());
 		improvInstructions = fileReader.interpretScript(lines);
 		System.out.println("jupiter improv script loaded, instruction count = "+improvInstructions.length);
@@ -335,7 +336,7 @@ public class JazzForMax extends MaxObject
 	
 	public void loadIltur2(){
 		
-		ReadFile fileReader = new ReadFile("/Users/masonbretan/Desktop/iltur 2/iltur2Script.txt"); //iltur
+		ReadFile fileReader = new ReadFile("/Users/musictechnology/Documents/IntelliJ_Shimon/Songs/iltur 2/iltur2Script.txt"); //iltur
 		List<String> lines = new ArrayList<String>(fileReader.getLines());
 		System.out.println(lines.size());
 		instructions = fileReader.interpretScript(lines);
@@ -353,7 +354,7 @@ public class JazzForMax extends MaxObject
 	
 	public void loadSteadyAsSheGoes(){
 		
-		ReadFile fileReader = new ReadFile("/Users/masonbretan/Desktop/steady as she goes/steady as she goes script.txt"); //iltur
+		ReadFile fileReader = new ReadFile("/Users/musictechnology/Documents/IntelliJ_Shimon/Songs/steady as she goes/steady as she goes script.txt"); //iltur
 		List<String> lines = new ArrayList<String>(fileReader.getLines());
 		instructions = fileReader.interpretScript(lines);
 		System.out.println("steady as she goes marimba script loaded, instruction count = "+instructions.length);
@@ -361,7 +362,7 @@ public class JazzForMax extends MaxObject
 	
 	public void loadIltur3(){
 		
-		ReadFile fileReader = new ReadFile("/Users/masonbretan/Desktop/iltur 3/iltur3 Script.txt"); //iltur
+		ReadFile fileReader = new ReadFile("/Users/musictechnology/Documents/IntelliJ_Shimon/Songs/iltur 3/iltur3 Script.txt"); //iltur
 		List<String> lines = new ArrayList<String>(fileReader.getLines());
 		System.out.println(lines.size());
 		instructions = fileReader.interpretScript(lines);
@@ -371,7 +372,7 @@ public class JazzForMax extends MaxObject
 	
 	public void loadWhatYouSay(){
 		
-		ReadFile fileReader = new ReadFile("/Users/masonbretan/Desktop/what you say/whatyousay_script.txt"); //iltur
+		ReadFile fileReader = new ReadFile("/Users/musictechnology/Documents/IntelliJ_Shimon/Songs/what you say/whatyousay_script.txt"); //iltur
 		List<String> lines = new ArrayList<String>(fileReader.getLines());
 		System.out.println(lines.size());
 		instructions = fileReader.interpretScript(lines);
