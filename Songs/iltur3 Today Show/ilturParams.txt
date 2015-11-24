@@ -1,0 +1,20 @@
+{
+    "song": "Iltur",
+    "phrases": [
+        {
+            "phrase": {
+                "start": {
+                    "measure": "1",
+                    "beat": "1"
+                },
+                "end": {
+                    "measure": "42",
+                    "beat": "2"
+                },
+                "bpm": "190",
+                "constraints":"1",
+                "style":"melody"
+            }
+        }    
+]
+}

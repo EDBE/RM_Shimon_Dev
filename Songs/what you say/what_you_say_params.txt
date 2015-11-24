@@ -1,0 +1,20 @@
+{
+    "song": "what you say",
+    "phrases": [
+        {
+            "phrase": {
+                "start": {
+                    "measure": "1",
+                    "beat": "1"
+                },
+                "end": {
+                    "measure": "272",
+                    "beat": "1"
+                },
+                "bpm": "158",
+                "constraints":"1",
+                "style":"melody"
+            }
+        }    
+]
+}

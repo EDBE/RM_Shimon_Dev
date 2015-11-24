@@ -1,0 +1,20 @@
+{
+    "song": "Dance of Jupiter and Venus",
+    "phrases": [
+        {
+            "phrase": {
+                "start": {
+                    "measure": "1",
+                    "beat": "1"
+                },
+                "end": {
+                    "measure": "125",
+                    "beat": "1"
+                },
+                "bpm": "109",
+                "constraints":"3",
+                "style":"melody"
+            }
+        }
+        ]
+}

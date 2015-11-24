@@ -292,23 +292,23 @@ public class JazzForMax extends MaxObject
 		phrase = jazzGenerator.updatePhrase(phraseLocations.get(phraseNum), phraseParams.get(phraseNum));
 	}
 	
-	
-	public void loadScript(){
-		
-		//ReadFile fileReader = new ReadFile("/Users/masonbretan/Desktop/songScript109_4.txt"); //dance of jupiter and venus
-		ReadFile fileReader = new ReadFile("/Users/masonbretan//iltur_short.txt"); //iltur
-		List<String> lines = new ArrayList<String>(fileReader.getLines());
-		instructions = fileReader.interpretScript(lines);
-		System.out.println("melody script loaded, instruction count = "+instructions.length);
-		
-		
-		
-		fileReader = new ReadFile("/Users/masonbretan/Desktop/improvScript.txt");
-		lines = new ArrayList<String>(fileReader.getLines());
-		improvInstructions = fileReader.interpretScript(lines);
-		System.out.println("improv script loaded, instruction count = "+improvInstructions.length);
-		
-	}
+//
+//	public void loadScript(){
+//
+//		//ReadFile fileReader = new ReadFile("/Users/masonbretan/Desktop/songScript109_4.txt"); //dance of jupiter and venus
+//		ReadFile fileReader = new ReadFile("/Users/masonbretan//iltur_short.txt"); //iltur
+//		List<String> lines = new ArrayList<String>(fileReader.getLines());
+//		instructions = fileReader.interpretScript(lines);
+//		System.out.println("melody script loaded, instruction count = "+instructions.length);
+//
+//
+//
+//		fileReader = new ReadFile("/Users/masonbretan/Desktop/improvScript.txt");
+//		lines = new ArrayList<String>(fileReader.getLines());
+//		improvInstructions = fileReader.interpretScript(lines);
+//		System.out.println("improv script loaded, instruction count = "+improvInstructions.length);
+//
+//	}
 	
 	public void loadJupiter(){
 		
@@ -325,14 +325,14 @@ public class JazzForMax extends MaxObject
 		
 	}
 	
-	public void loadIltur_Short(){
-		
-		ReadFile fileReader = new ReadFile("/Users/masonbretan/Desktop/iltur3 Today Show/Tiltur_short.txt"); //iltur
-		List<String> lines = new ArrayList<String>(fileReader.getLines());
-		instructions = fileReader.interpretScript(lines);
-		System.out.println("iltur_short melody script loaded, instruction count = "+instructions.length);
-	}
-	
+//	public void loadIltur_Short(){
+//
+//		ReadFile fileReader = new ReadFile("/Users/masonbretan/Desktop/iltur3 Today Show/Tiltur_short.txt"); //iltur
+//		List<String> lines = new ArrayList<String>(fileReader.getLines());
+//		instructions = fileReader.interpretScript(lines);
+//		System.out.println("iltur_short melody script loaded, instruction count = "+instructions.length);
+//	}
+//
 	
 	public void loadIltur2(){
 		
@@ -343,14 +343,14 @@ public class JazzForMax extends MaxObject
 		System.out.println("iltur2 melody/improv script loaded, instruction count = "+instructions.length);
 	}
 	
-	public void loadPitty(){
-		
-		ReadFile fileReader = new ReadFile("/Users/masonbretan/Desktop/pittyScript.txt"); //iltur
-		List<String> lines = new ArrayList<String>(fileReader.getLines());
-		instructions = fileReader.interpretScript(lines);
-		System.out.println("pitty melody script loaded, instruction count = "+instructions.length);
-	}
-	
+//	public void loadPitty(){
+//
+//		ReadFile fileReader = new ReadFile("/Users/masonbretan/Desktop/pittyScript.txt"); //iltur
+//		List<String> lines = new ArrayList<String>(fileReader.getLines());
+//		instructions = fileReader.interpretScript(lines);
+//		System.out.println("pitty melody script loaded, instruction count = "+instructions.length);
+//	}
+//
 	
 	public void loadSteadyAsSheGoes(){
 		

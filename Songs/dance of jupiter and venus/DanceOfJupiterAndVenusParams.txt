@@ -1,0 +1,65 @@
+{
+    "song": "Dance of Jupiter and Venus",
+    "phrases": [
+        {
+            "phrase": {
+                "start": {
+                    "measure": "1",
+                    "beat": "1"
+                },
+                "end": {
+                    "measure": "90",
+                    "beat": "2"
+                },
+                "bpm": "109",
+                "constraints":"1",
+                "style":"melody"
+            }
+        },
+        {
+            "phrase": {
+                "start": {
+                    "measure": "91",
+                    "beat": "1"
+                },
+                "end": {
+                    "measure": "125",
+                    "beat": "1"
+                },
+                "bpm": "109",
+                "constraints":"2",
+                "style":"melody"
+            }
+        },
+        {
+            "phrase": {
+                "start": {
+                    "measure": "125",
+                    "beat": "1"
+                },
+                "end": {
+                    "measure": "155",
+                    "beat": "2"
+                },
+                "bpm": "145",
+                "constraints":"1",
+                "style":"melody"
+            }
+        },
+        {
+            "phrase": {
+                "start": {
+                    "measure": "155",
+                    "beat": "3"
+                },
+                "end": {
+                    "measure": "186",
+                    "beat": "4"
+                },
+                "bpm": "109",
+                "constraints":"1",
+                "style":"melody"
+            }
+        }
+    ]
+}
