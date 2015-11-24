@@ -18,7 +18,7 @@ public class TestForPianoDuet {
         if (args.length > 0) {
             _filename = args[0];
         } else {
-            System.out.println("You need to specify any filename as an input arguments");
+            System.out.println("You need to specify any filename as an input");
             System.exit(0);
         }
 
