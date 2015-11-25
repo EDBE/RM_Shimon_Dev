@@ -19,6 +19,7 @@ public class head_move_to_tempo extends MaxObject {
     int beatPosition = 1;
     long lastTime;
     volatile boolean listening = true;
+    volatile boolean breath = false;
     //    volatile boolean playing = true;
     float headNodInterval;
     int behaviorNodCount = 0;
@@ -41,7 +42,7 @@ public class head_move_to_tempo extends MaxObject {
 		Output 5:
 		*/
         declareInlets(new int[]{DataTypes.ALL, DataTypes.ALL});
-        declareOutlets(new int[]{DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL});
+        declareOutlets(new int[]{DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL});
         lastTime = System.currentTimeMillis();
     }
 
@@ -76,12 +77,29 @@ public class head_move_to_tempo extends MaxObject {
             headNodInterval = intervalCalculation(smoothedTempo(realTimeTempoBuffer, lastSeveralNotes));
             System.out.println("the interval of nod is " + headNodInterval);
 //            System.out.println("beat position is " + beatPosition);
-            if (beatPosition % 16 == 1) {    //update the head move task every two measures
+            if (beatPosition % 16 == 2) {    //update the head move task every two measures
                 startHeadMove((int) (headNodInterval / 2));
             }
-            if (beatPosition == 80) {
+            if (beatPosition == 78) {
                 cancelHeadMove();
+                breathing();
             }
+        }
+    }
+
+    public void breathing() {
+        if (listening) {
+            if (beatPosition == 1) {
+                outlet(5, "/breathing");
+                breath = true;
+            }
+        }
+    }
+
+    public void stopBreath() {
+        if (beatPosition == 3) {
+            outlet(5, "/stopBreath");
+            breath = false;
         }
     }
 
@@ -147,7 +165,7 @@ public class head_move_to_tempo extends MaxObject {
 
     public void lookCenter() {
         outlet(0, 0f);
-        outlet(2, 835);
+//        outlet(2, 835);
     }
 
 
@@ -156,7 +174,7 @@ public class head_move_to_tempo extends MaxObject {
 
         public void run() {
 
-
+            stopBreath();
             if (nodCount <= 64) {
                 if (nodCount < 32) {
                     // look human player first
