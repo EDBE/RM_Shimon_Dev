@@ -14,7 +14,7 @@ public class head_move_to_tempo extends MaxObject {
     Random rand = new Random();
     volatile List<Float> realTimeTempoBuffer = new ArrayList<Float>();
 
-    int scoreBPM = 72;   //set BPM by score
+    int scoreBPM = 88;   //set BPM by score
     int lastSeveralNotes = 5;
     int beatPosition = 1;
     long lastTime;
@@ -76,12 +76,12 @@ public class head_move_to_tempo extends MaxObject {
             headNodInterval = intervalCalculation(smoothedTempo(realTimeTempoBuffer, lastSeveralNotes));
             System.out.println("the interval of nod is " + headNodInterval);
 //            System.out.println("beat position is " + beatPosition);
-            if (beatPosition % 16 == 0) {    //update the head move task every two measures
+            if (beatPosition % 16 == 1) {    //update the head move task every two measures
                 startHeadMove((int) (headNodInterval / 2));
             }
-//            if (beatPosition == 80) {
-//                cancelHeadMove();
-//            }
+            if (beatPosition == 80) {
+                cancelHeadMove();
+            }
         }
     }
 
@@ -158,11 +158,11 @@ public class head_move_to_tempo extends MaxObject {
 
 
             if (nodCount <= 64) {
-                if (nodCount < 16) {
+                if (nodCount < 32) {
                     // look human player first
                     lookLeft();
                     System.out.println("I am looking left");
-                } else if (nodCount > 32 && nodCount < 64) {
+                } else if (nodCount > 48 && nodCount < 64) {
                     // look center
 //                    lookCenter();
                     lookRight();
@@ -178,7 +178,7 @@ public class head_move_to_tempo extends MaxObject {
 //                outlet(0, 0);
                 timer1.schedule(new headNod(), waitTime);
             } else {
-                waitTime = (int) (headNodInterval * 4);
+                waitTime = (int) (headNodInterval * 2);
 //                lookCenter();
                 //outlet(0, 0);
                 timer1.schedule(new headNodBehavior(), waitTime);
@@ -258,7 +258,8 @@ public class head_move_to_tempo extends MaxObject {
                 //nodType = 1;
                 headNodInterval *= 1;
                 if (rand.nextFloat() > .7f) {
-                    float lookAtPosition = rand.nextFloat() * 2 - 1.1f;
+//                    float lookAtPosition = rand.nextFloat() * 2 - 1.1f;
+                    float lookAtPosition = rand.nextFloat() * 1.1f - 1.1f;
                     outlet(0, lookAtPosition);
                     System.out.println("I am looking at " + lookAtPosition);
                 }
