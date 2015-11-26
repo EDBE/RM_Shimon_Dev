@@ -17,6 +17,7 @@ public class head_move_to_tempo extends MaxObject {
     int scoreBPM = 88;   //set BPM by score
     int lastSeveralNotes = 5;
     int beatPosition = 1;
+    int Accompaniment_Event_Num = 0;
     long lastTime;
     volatile boolean listening = true;
     volatile boolean breath = false;
@@ -82,8 +83,10 @@ public class head_move_to_tempo extends MaxObject {
             }
             if (beatPosition == 78) {
                 cancelHeadMove();
-                breathing();
             }
+//            if (Accompaniment_Event_Num == 95) {
+//                breathing();
+//            }
         }
     }
 
@@ -95,12 +98,26 @@ public class head_move_to_tempo extends MaxObject {
             }
         }
     }
-
+/*
+stopBreath would be called by the end of the piece
+ */
     public void stopBreath() {
         if (beatPosition == 3) {
             outlet(5, "/stopBreath");
             breath = false;
         }
+    }
+/*
+stop_beforeStart would be used by operator to stop Shimon's breathing
+ */
+    public void stop_beforeStart() {
+//        cancelHeadMove();
+        outlet(5, "/stopBreath");
+        breath = false;
+    }
+
+    public void eventTracking(int _eventNum) {
+        Accompaniment_Event_Num = _eventNum;
     }
 
     /*
