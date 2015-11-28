@@ -17,6 +17,7 @@ public class head_move_to_tempo extends MaxObject {
     int scoreBPM = 88;   //set BPM by score
     int lastSeveralNotes = 5;
     int beatPosition = 1;
+    int pitchNum = 0;
     int Accompaniment_Event_Num = 0;
     long lastTime;
     volatile boolean listening = true;
@@ -121,6 +122,30 @@ stop_beforeStart would be used by operator to stop Shimon's breathing
     }
 
     /*
+    get the MIDI pitch from Shimon
+     */
+    public void pitch(int _pitch) {
+        if (_pitch > 47 && _pitch < 95) {
+            pitchNum = _pitch;
+        }
+    }
+
+    /*
+    input: MIDI pitch number (from 48 to 95)
+    output: the angle of Shimon's head (from -1.0 to 1.0)
+     */
+    public float pitchScaleToHead(int _pitch) {
+        float headAngle;
+        if (_pitch > 47 && _pitch < 96) {
+//            headAngle = ((pitchNum - 48) / (47.f) * (2.0)) - 1.0;
+            headAngle = 2.f/47 * (_pitch - 48) + (-1.f);
+        } else {
+            headAngle = 0.f;
+        }
+        return headAngle;
+    }
+
+    /*
     input: tempo value
     output: time interval of quarter note in million second
      */
@@ -171,12 +196,12 @@ stop_beforeStart would be used by operator to stop Shimon's breathing
     }
 
     public void lookRight() {
-        outlet(0, 1.1f);
+        outlet(0, 1.f);
 //        outlet(2, 835);
     }
 
     public void lookLeft() {
-        outlet(0, -1.1f);
+        outlet(0, -1.f);
 //        outlet(2, 835);
     }
 
@@ -185,22 +210,23 @@ stop_beforeStart would be used by operator to stop Shimon's breathing
 //        outlet(2, 835);
     }
 
-
     class headNod extends TimerTask {
         long waitTime;
 
         public void run() {
 
-            stopBreath();
-            if (nodCount <= 64) {
-                if (nodCount < 32) {
+            if (breath) {
+                stopBreath();
+            }
+            if (nodCount <= 16) {
+                if (nodCount < 12) {
                     // look human player first
                     lookLeft();
                     System.out.println("I am looking left");
-                } else if (nodCount > 48 && nodCount < 64) {
-                    // look center
-//                    lookCenter();
-                    lookRight();
+//                } else if (nodCount > 48 && nodCount < 64) {
+//                    // look center
+////                    lookCenter();
+//                    lookRight();
                     System.out.println("I am looking right");
                 } else {
                     lookCenter();
@@ -209,7 +235,7 @@ stop_beforeStart would be used by operator to stop Shimon's breathing
                 nodCount++;
                 System.out.println("number of nod " + nodCount);
                 waitTime = (int) headNodInterval;
-                outlet(1, headNodInterval);
+                outlet(2, headNodInterval);
 //                outlet(0, 0);
                 timer1.schedule(new headNod(), waitTime);
             } else {
@@ -294,13 +320,14 @@ stop_beforeStart would be used by operator to stop Shimon's breathing
                 headNodInterval *= 1;
                 if (rand.nextFloat() > .7f) {
 //                    float lookAtPosition = rand.nextFloat() * 2 - 1.1f;
-                    float lookAtPosition = rand.nextFloat() * 1.1f - 1.1f;
+//                    float lookAtPosition = rand.nextFloat() * 1.1f - 1.1f;
+                    float lookAtPosition = pitchScaleToHead(pitchNum);
                     outlet(0, lookAtPosition);
                     System.out.println("I am looking at " + lookAtPosition);
                 }
 
                 if (behaviorNodCount < 10) {
-                    outlet(2, headNodInterval);
+                    outlet(1, headNodInterval);
                     System.out.println("I am using hiphop Middle");
                 } else {
 
@@ -309,12 +336,12 @@ stop_beforeStart would be used by operator to stop Shimon's breathing
                         float randNum = rand.nextFloat();
                         if (randNum < .5f) {
                             //outlet(2,headNodInterval);
-                            nodType = 1;
+                            nodType = 2;
                         } else if (randNum < .85f) {
                             //outlet(3,headNodInterval);
-                            nodType = 2;
-                        } else {
                             nodType = 3;
+                        } else {
+                            nodType = 1;
                             //outlet(4,headNodInterval);
                         }
                     }
