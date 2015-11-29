@@ -11,6 +11,7 @@ import java.util.*;
 
 public class head_move_to_tempo extends MaxObject {
     Timer timer1 = new Timer();
+    Timer timer2 = new Timer();
     Random rand = new Random();
     volatile List<Float> realTimeTempoBuffer = new ArrayList<Float>();
 
@@ -44,7 +45,7 @@ public class head_move_to_tempo extends MaxObject {
 		Output 5:
 		*/
         declareInlets(new int[]{DataTypes.ALL, DataTypes.ALL});
-        declareOutlets(new int[]{DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL});
+        declareOutlets(new int[]{DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL});
         lastTime = System.currentTimeMillis();
     }
 
@@ -89,15 +90,30 @@ public class head_move_to_tempo extends MaxObject {
 //                breathing();
 //            }
         }
+        lastTime = System.currentTimeMillis();
     }
 
+    /*
+    At the moment of starting of a piece, Shimon starts to move based pan, move neck pan, move head tilt, and then breath
+     */
     public void breathing() {
-        if (listening) {
-            if (beatPosition == 1) {
-                outlet(5, "/breathing");
-                breath = true;
-            }
+//        if (listening) {
+//            timer2 = new Timer();
+//            timer2.schedule(new headStartingMove_Basepan(), 500);
+//
+//            if (beatPosition == 1) {
+//                outlet(5, "/breathing");
+//                breath = true;
+//            }
+//        }
+        if (beatPosition == 1) {
+//            outlet(5, "/breathing");
+            timer2 = new Timer();
+            timer2.schedule(new headStartingMove_Basepan(), 500);
         }
+//        if (System.currentTimeMillis() - lastTime > 1500) {
+//            timer2.cancel();
+//        }
     }
 /*
 stopBreath would be called by the end of the piece
@@ -138,7 +154,7 @@ stop_beforeStart would be used by operator to stop Shimon's breathing
         float headAngle;
         if (_pitch > 47 && _pitch < 96) {
 //            headAngle = ((pitchNum - 48) / (47.f) * (2.0)) - 1.0;
-            headAngle = 2.f/47 * (_pitch - 48) + (-1.f);
+            headAngle = 2.2f/47 * (_pitch - 48) + (-1.1f);
         } else {
             headAngle = 0.f;
         }
@@ -191,6 +207,7 @@ stop_beforeStart would be used by operator to stop Shimon's breathing
         listening = true;
 //        playing = false;
         timer1.cancel();
+        timer2.cancel();
         nodCount = 0;
         behaviorNodCount = 0;
     }
@@ -314,47 +331,87 @@ stop_beforeStart would be used by operator to stop Shimon's breathing
 
 
 
-        class headNodBehavior extends TimerTask {
-            public void run() {
+    class headNodBehavior extends TimerTask {
+        public void run() {
                 //nodType = 1;
-                headNodInterval *= 1;
-                if (rand.nextFloat() > .7f) {
+            headNodInterval *= 1;
+            if (rand.nextFloat() > .7f) {
 //                    float lookAtPosition = rand.nextFloat() * 2 - 1.1f;
 //                    float lookAtPosition = rand.nextFloat() * 1.1f - 1.1f;
-                    float lookAtPosition = pitchScaleToHead(pitchNum);
-                    outlet(0, lookAtPosition);
-                    System.out.println("I am looking at " + lookAtPosition);
-                }
+                float lookAtPosition = pitchScaleToHead(pitchNum);
+                outlet(0, lookAtPosition);
+                System.out.println("I am looking at " + lookAtPosition);
+            }
 
-                if (behaviorNodCount < 10) {
-                    outlet(1, headNodInterval);
-                    System.out.println("I am using hiphop Middle");
-                } else {
+            if (behaviorNodCount < 10) {
+                outlet(1, headNodInterval);
+                System.out.println("I am using hiphop Middle");
+            } else {
 
-                    if (rand.nextFloat() > .7f) {
+                if (rand.nextFloat() > .7f) {
 
-                        float randNum = rand.nextFloat();
-                        if (randNum < .5f) {
+                    float randNum = rand.nextFloat();
+                    if (randNum < .5f) {
                             //outlet(2,headNodInterval);
-                            nodType = 2;
-                        } else if (randNum < .85f) {
+                        nodType = 2;
+                    } else if (randNum < .85f) {
                             //outlet(3,headNodInterval);
-                            nodType = 3;
-                        } else {
-                            nodType = 1;
+                        nodType = 3;
+                    } else {
+                        nodType = 1;
                             //outlet(4,headNodInterval);
-                        }
                     }
-                    behaviorNodCount=0;
-                    outlet(nodType, headNodInterval);
-                    System.out.println("nodType is " + nodType);
-
                 }
-                behaviorNodCount++;
-                System.out.println("number of behavior nod is " + behaviorNodCount);
+                behaviorNodCount=0;
+                outlet(nodType, headNodInterval);
+                System.out.println("nodType is " + nodType);
 
-                timer1.schedule(new headNodBehavior(), (int) headNodInterval);
+            }
+            behaviorNodCount++;
+            System.out.println("number of behavior nod is " + behaviorNodCount);
+
+            timer1.schedule(new headNodBehavior(), (int) headNodInterval);
 //            timer1.schedule(new headNodBehavior(), 0);  //This is a test
+        }
+    }
+
+    class headStartingMove_Basepan extends TimerTask {
+        public void run() {
+            outlet(4, -0.4f);
+            System.out.println("basepan move");
+            timer2.schedule(new headStartingMove_Neckpan(), 800);
+
+//            if (System.currentTimeMillis() - 500 > lastTime) {
+//                outlet(4, -0.5);
+//                outlet(0, -0.2);
+//                outlet(6, 0.35);
+//                System.out.println("I am looking at You!");
+//            }
+        }
+    }
+
+    class headStartingMove_Neckpan extends TimerTask {
+        public void run() {
+            outlet(0, -0.2f);
+            System.out.println("neckpan move");
+            timer2.schedule(new headStartingMove_HeadTilt(), 500);
+        }
+    }
+
+    class headStartingMove_HeadTilt extends TimerTask {
+        public void run() {
+            outlet(6, 0.6f);
+            System.out.println("head tilt");
+            if (beatPosition == 1) {
+                timer2.schedule(new headStartingMove_Breathing(), 1000);
             }
         }
     }
+
+    class headStartingMove_Breathing extends TimerTask {
+        public void run() {
+            outlet(5, "/breathing");
+            breath = true;
+        }
+    }
+}
