@@ -84,13 +84,11 @@ public class head_move_to_tempo extends MaxObject {
                 startHeadMove((int) (headNodInterval / 2));
             }
             if (beatPosition == 78) {
+
                 cancelHeadMove();
+
             }
-//            if (Accompaniment_Event_Num == 95) {
-//                breathing();
-//            }
         }
-        lastTime = System.currentTimeMillis();
     }
 
     /*
@@ -109,7 +107,7 @@ public class head_move_to_tempo extends MaxObject {
         if (beatPosition == 1) {
 //            outlet(5, "/breathing");
             timer2 = new Timer();
-            timer2.schedule(new headStartingMove_Basepan(), 500);
+            timer2.schedule(new headStartingMove_Neckpan(), 1000);
         }
 //        if (System.currentTimeMillis() - lastTime > 1500) {
 //            timer2.cancel();
@@ -130,6 +128,7 @@ stop_beforeStart would be used by operator to stop Shimon's breathing
     public void stop_beforeStart() {
 //        cancelHeadMove();
         outlet(5, "/stopBreath");
+        outlet(4, 0);
         breath = false;
     }
 
@@ -154,7 +153,7 @@ stop_beforeStart would be used by operator to stop Shimon's breathing
         float headAngle;
         if (_pitch > 47 && _pitch < 96) {
 //            headAngle = ((pitchNum - 48) / (47.f) * (2.0)) - 1.0;
-            headAngle = 2.2f/47 * (_pitch - 48) + (-1.1f);
+            headAngle = 2.8f/47 * (_pitch - 48) + (-.9f);
         } else {
             headAngle = 0.f;
         }
@@ -218,7 +217,7 @@ stop_beforeStart would be used by operator to stop Shimon's breathing
     }
 
     public void lookLeft() {
-        outlet(0, -1.f);
+        outlet(0, -.3f);
 //        outlet(2, 835);
     }
 
@@ -235,8 +234,8 @@ stop_beforeStart would be used by operator to stop Shimon's breathing
             if (breath) {
                 stopBreath();
             }
-            if (nodCount <= 16) {
-                if (nodCount < 12) {
+            if (nodCount <= 11) {
+                if (nodCount < 11) {
                     // look human player first
                     lookLeft();
                     System.out.println("I am looking left");
@@ -335,17 +334,21 @@ stop_beforeStart would be used by operator to stop Shimon's breathing
         public void run() {
                 //nodType = 1;
             headNodInterval *= 1;
-            if (rand.nextFloat() > .7f) {
+            if (rand.nextFloat() > .5f) {
 //                    float lookAtPosition = rand.nextFloat() * 2 - 1.1f;
 //                    float lookAtPosition = rand.nextFloat() * 1.1f - 1.1f;
-                float lookAtPosition = pitchScaleToHead(pitchNum);
+                if (behaviorNodCount > 6 && behaviorNodCount < 9) {
+                    lookLeft();
+                } else  {
+                    float lookAtPosition = pitchScaleToHead(pitchNum);
                 outlet(0, lookAtPosition);
                 System.out.println("I am looking at " + lookAtPosition);
+                }
             }
 
             if (behaviorNodCount < 10) {
                 outlet(1, headNodInterval);
-                System.out.println("I am using hiphop Middle");
+                System.out.println("I am using hiphop Low");
             } else {
 
                 if (rand.nextFloat() > .7f) {
@@ -353,10 +356,10 @@ stop_beforeStart would be used by operator to stop Shimon's breathing
                     float randNum = rand.nextFloat();
                     if (randNum < .5f) {
                             //outlet(2,headNodInterval);
-                        nodType = 2;
+                        nodType = 3;
                     } else if (randNum < .85f) {
                             //outlet(3,headNodInterval);
-                        nodType = 3;
+                        nodType = 2;
                     } else {
                         nodType = 1;
                             //outlet(4,headNodInterval);
@@ -375,20 +378,20 @@ stop_beforeStart would be used by operator to stop Shimon's breathing
         }
     }
 
-    class headStartingMove_Basepan extends TimerTask {
-        public void run() {
-            outlet(4, -0.4f);
-            System.out.println("basepan move");
-            timer2.schedule(new headStartingMove_Neckpan(), 800);
-
-//            if (System.currentTimeMillis() - 500 > lastTime) {
-//                outlet(4, -0.5);
-//                outlet(0, -0.2);
-//                outlet(6, 0.35);
-//                System.out.println("I am looking at You!");
-//            }
-        }
-    }
+//    class headStartingMove_Basepan extends TimerTask {
+//        public void run() {
+//            outlet(4, -0.4f);
+//            System.out.println("basepan move");
+//            timer2.schedule(new headStartingMove_Neckpan(), 800);
+//
+////            if (System.currentTimeMillis() - 500 > lastTime) {
+////                outlet(4, -0.5);
+////                outlet(0, -0.2);
+////                outlet(6, 0.35);
+////                System.out.println("I am looking at You!");
+////            }
+//        }
+//    }
 
     class headStartingMove_Neckpan extends TimerTask {
         public void run() {
