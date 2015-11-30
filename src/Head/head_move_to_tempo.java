@@ -337,7 +337,7 @@ stop_beforeStart would be used by operator to stop Shimon's breathing
             if (rand.nextFloat() > .5f) {
 //                    float lookAtPosition = rand.nextFloat() * 2 - 1.1f;
 //                    float lookAtPosition = rand.nextFloat() * 1.1f - 1.1f;
-                if (behaviorNodCount > 6 && behaviorNodCount < 9) {
+                if (behaviorNodCount > 11 && behaviorNodCount < 16) {
                     lookLeft();
                 } else  {
                     float lookAtPosition = pitchScaleToHead(pitchNum);
@@ -346,7 +346,7 @@ stop_beforeStart would be used by operator to stop Shimon's breathing
                 }
             }
 
-            if (behaviorNodCount < 10) {
+            if (behaviorNodCount < 16) {
                 outlet(1, headNodInterval);
                 System.out.println("I am using hiphop Low");
             } else {
