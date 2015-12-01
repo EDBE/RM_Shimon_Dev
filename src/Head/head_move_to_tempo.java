@@ -245,7 +245,7 @@ stop_beforeStart would be used by operator to stop Shimon's breathing
 //                    lookRight();
                     System.out.println("I am looking right");
                 } else {
-                    lookCenter();
+                    lookLeft();
                     System.out.println("I am looking center");
                 }
                 nodCount++;
@@ -395,7 +395,7 @@ stop_beforeStart would be used by operator to stop Shimon's breathing
 
     class headStartingMove_Neckpan extends TimerTask {
         public void run() {
-            outlet(0, -0.2f);
+            outlet(0, -0.4f);
             System.out.println("neckpan move");
             timer2.schedule(new headStartingMove_HeadTilt(), 500);
         }
