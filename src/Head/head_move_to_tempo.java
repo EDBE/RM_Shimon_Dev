@@ -113,18 +113,18 @@ public class head_move_to_tempo extends MaxObject {
 //            timer2.cancel();
 //        }
     }
-/*
-stopBreath would be called by the end of the piece
- */
+    /*
+    stopBreath would be called by the end of the piece
+    */
     public void stopBreath() {
         if (beatPosition == 3) {
             outlet(5, "/stopBreath");
             breath = false;
         }
     }
-/*
-stop_beforeStart would be used by operator to stop Shimon's breathing
- */
+    /*
+    stop_beforeStart would be used by operator to stop Shimon's breathing
+    */
     public void stop_beforeStart() {
 //        cancelHeadMove();
         outlet(5, "/stopBreath");
@@ -368,7 +368,6 @@ stop_beforeStart would be used by operator to stop Shimon's breathing
                 behaviorNodCount=0;
                 outlet(nodType, headNodInterval);
                 System.out.println("nodType is " + nodType);
-
             }
             behaviorNodCount++;
             System.out.println("number of behavior nod is " + behaviorNodCount);
