@@ -27,7 +27,7 @@ public class PlayPlanned extends MaxObject{
     {
         declareInlets(new int[]{DataTypes.ALL});
         declareOutlets(new int[]{DataTypes.ALL,DataTypes.ALL,DataTypes.ALL,DataTypes.ALL});
-
+        System.out.println("PlayPlanned mxj object is updated!!!");
     }
 
     public void bang()
