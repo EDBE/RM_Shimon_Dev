@@ -105,7 +105,7 @@ public class PlayPlanned extends MaxObject{
             if(instructions[count][i]!=-1){
                 command[2] = 0;
                 if(instructions[count][i] == instructions[count][4]){
-                    command[2] = 105;
+                    command[2] = 43;
                 }
                 command[0] = i;
                 command[1] = instructions[count][i];
@@ -123,7 +123,7 @@ public class PlayPlanned extends MaxObject{
                 if(instructions[instructionCount][i]!=-1){
                     command[2] = 0;
                     if(instructions[instructionCount][i] == instructions[instructionCount][4]){
-                        command[2] = 100;
+                        command[2] = 43;
                     }
 
                     if(instructions[instructionCount][i] != instructions[instructionCount-1][i] || command[2] != 0){
@@ -139,7 +139,7 @@ public class PlayPlanned extends MaxObject{
                 if(instructions[instructionCount][i]!=-1){
                     command[2] = 0;
                     if(instructions[instructionCount][i] == instructions[instructionCount][4]){
-                        command[2] = 105;
+                        command[2] = 43;
                     }
                     command[0] = i;
                     command[1] = instructions[instructionCount][i];
@@ -166,7 +166,7 @@ public class PlayPlanned extends MaxObject{
                 if(improvInstructions[instructionCount][i]!=-1){
                     command[2] = 0;
                     if(improvInstructions[instructionCount][i] == improvInstructions[instructionCount][4]){
-                        command[2] = 105;
+                        command[2] = 53;
                     }
 
                     if(improvInstructions[instructionCount][i] != improvInstructions[instructionCount-1][i] || command[2] != 0){
@@ -182,7 +182,7 @@ public class PlayPlanned extends MaxObject{
                 if(improvInstructions[instructionCount][i]!=-1){
                     command[2] = 0;
                     if(improvInstructions[instructionCount][i] == improvInstructions[instructionCount][4]){
-                        command[2] = 105;
+                        command[2] = 53;
                     }
                     command[0] = i;
                     command[1] = improvInstructions[instructionCount][i];

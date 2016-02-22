@@ -15,7 +15,7 @@ import java.lang.reflect.Array;
 import java.util.*;
 
 /**
- * Created by musictechnology on 10/22/15.
+ * Created by Liang Tang on 10/22/15.
  */
 public class AntescofoScore {
 
