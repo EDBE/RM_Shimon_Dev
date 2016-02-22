@@ -59,7 +59,7 @@ public class PlayPlanned extends MaxObject{
 
     public void loadScript(){
 
-        ReadFile fileReader = new ReadFile("/Users/musictechnology/Dropbox/1_Spring_2016/7100MUSI/WeeklyDemo/2.17/liang_song/liang_song_p1_instructions.txt");
+        ReadFile fileReader = new ReadFile("/Users/musictechnology/Dropbox/1_Spring_2016/7100MUSI/WeeklyDemo/2.24/liang_song/liang_song_p1_instructions.txt");
         List<String> lines = new ArrayList<String>(fileReader.getLines());
         instructions = fileReader.interpretScript(lines);
         System.out.println("melody script loaded, instruction count = "+instructions.length);

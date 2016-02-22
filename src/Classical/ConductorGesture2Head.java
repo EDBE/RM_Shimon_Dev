@@ -10,15 +10,18 @@ import com.cycling74.max.MaxObject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
+import java.util.TimerTask;
 
 public class ConductorGesture2Head extends MaxObject {
-    Timer tTimer1                             = new Timer();
-    int iNumOfPass                            = 6;
-    int iCurrentNumOfPass                     = 0;
-    volatile List<Long> llIntervalBuffer      = new ArrayList<Long>(iNumOfPass);
+    Timer tTimer1 = new Timer();
+    int iNumOfPass = 6;
+    int iCurrentNumOfPass = 0;
+    int iNodNum = 6;
+    int iNodCounter = 0;
+    volatile List<Long> llIntervalBuffer = new ArrayList<Long>(iNumOfPass);
     long lLastTimeStamp, lSecondLastTimeStamp = System.currentTimeMillis();
-    long lMoveStartTimeStamp                  = 0;
-    float fLastPosition, fSecondLastPosition  = 0.f;
+    long lMoveStartTimeStamp = 0;
+    float fLastPosition, fSecondLastPosition = 0.f;
 
     enum eHandDirection {
         ArmLeft,
@@ -26,53 +29,53 @@ public class ConductorGesture2Head extends MaxObject {
         ArmUp,
         ArmDown
     }
+
     eHandDirection ehCurrentDirection = eHandDirection.ArmRight;
 
-    float fShimonHeadNodInterval              = 0.f;
-    boolean bIsWatching                       = false;
-    boolean bIsValidData                      = false;
-    boolean bIsBreath                         = false;
-    boolean bIsMoving                         = false;
+    float fShimonHeadNodInterval = 0.f;
+    boolean bIsWatching = false;
+    boolean bIsValidData = false;
+    boolean bIsBreath = false;
+    boolean bIsMoving = false;
 
-    float fUpperBoundLeftHand                 = 100.f;
-    float fLowerBoundLeftHand                 = -100.f;
-    float fUpperBoundRightHand                = 400.f;
-    float fLowerBoundRightHand                = -400.f;
+    float fUpperBoundLeftHand = 100.f;
+    float fLowerBoundLeftHand = -100.f;
+    float fUpperBoundRightHand = 400.f;
+    float fLowerBoundRightHand = -400.f;
 
-    float fKeyPointUpperBound                 = 5.f;
-    float fKeyPointLowerBound                 = -5.f;
+    float fKeyPointUpperBound = 5.f;
+    float fKeyPointLowerBound = -5.f;
 
     //Constructor: 2 inlet, 6 outlet mxj object
     public ConductorGesture2Head() {
-        declareInlets(new int[] {DataTypes.ALL, DataTypes.ALL});
-        declareOutlets(new int[] {DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL,});
+        declareInlets(new int[]{DataTypes.ALL, DataTypes.ALL});
+        declareOutlets(new int[]{DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL,});
         resetAll();
         System.out.println("The ConductorGesture2Head mxj object is updated!");
     }
 
     /*
     Input: float position data (for example: left hand y axis data)
-    Output: boolean-switch between the watching and not watching.
-    Starting breath if left hand is in the range, Stop breath if left hand move out of range
+    Output: none
+    switch between the watching and not watching. If left hand is in range, start watching
+    Then, starting breathing when switching from not watching to watching
     Caller: calculateDuration function
      */
-    public void shimonIsWatching (float fPositionData) {
+    public void shimonIsWatching(float fPositionData) {
         if (bIsWatching == false) {
             if (fPositionData > fLowerBoundLeftHand && fPositionData < fUpperBoundLeftHand) {
                 bIsWatching = true;
+                System.out.println("Shimon is watching!");
                 if (!bIsBreath) {
-                    outlet(5, "/breathing");
-                    bIsBreath = true;
+                    startBreath();
                 }
-//                lLastTimeStamp = System.currentTimeMillis();
             }
-        }
-        else if (bIsWatching == true) {
+        } else if (bIsWatching == true) {
             if (fPositionData < fLowerBoundLeftHand || fPositionData > fUpperBoundLeftHand) {
                 bIsWatching = false;
-                if(bIsBreath) {
-                    outlet(5, "/stopBreath");
-                    bIsBreath = false;
+                System.out.println("Shimon is resting!");
+                if (bIsBreath) {
+                    stopBreath();
                 }
             }
         }
@@ -99,9 +102,9 @@ public class ConductorGesture2Head extends MaxObject {
     Output: number of passing key point
     Caller:
      */
-    public void passKeyPoint (float fPositionData) {
+    public void passKeyPoint(float fPositionData) {
         if (fPositionData < fKeyPointUpperBound && fPositionData > fKeyPointLowerBound) {
-            if (fPositionData > (fKeyPointLowerBound + fKeyPointUpperBound) / 2  && ehCurrentDirection == eHandDirection.ArmRight) {
+            if (fPositionData > (fKeyPointLowerBound + fKeyPointUpperBound) / 2 && ehCurrentDirection == eHandDirection.ArmRight) {
                 lSecondLastTimeStamp = lLastTimeStamp;
                 lLastTimeStamp = System.currentTimeMillis();
                 ehCurrentDirection = eHandDirection.ArmLeft;
@@ -114,6 +117,32 @@ public class ConductorGesture2Head extends MaxObject {
                 iCurrentNumOfPass += 1;
                 System.out.println("Counting!Left to Right");
             }
+        }
+    }
+
+    /*
+    let user set the number of gesture observations
+    set the iNumOfPass in this class
+    By default: iNumOfPass = 6
+     */
+    public void setNumOfGestureObserve(int number) {
+        if (number < 20 && number >= 2) {
+            iNumOfPass = number;
+            llIntervalBuffer.clear();
+            llIntervalBuffer = new ArrayList<Long>(iNumOfPass);
+            System.out.println("User is setting the number of observations to " + iNumOfPass);
+        }
+    }
+
+    /*
+    let user set the number of Shimon's responding gesture
+    set the iNodNum in this class
+    By default: iNodNum = 6
+     */
+    public void setNumOfShimonResponse(int number) {
+        if (number < 10 && number >=2) {
+            iNodNum = number;
+            System.out.println("Once the tempo detected, Shimon will response with " + iNodNum + " times.");
         }
     }
 
@@ -142,25 +171,36 @@ public class ConductorGesture2Head extends MaxObject {
             if (iCurrentNumOfPass == iNumOfPass) {
                 float avgTimeInterval = averageInterval(llIntervalBuffer);
                 if (bIsBreath) {
-                    outlet(5, "/stopBreath");
+                    stopBreath();
                 }
                 //output number of pass to be used to count the number of Shimon's head movement
                 outlet(4, iNumOfPass);
                 //output the time interval which will make Shimon bob his head in the same tempo
-                outlet(0, avgTimeInterval);
+//                outlet(0, avgTimeInterval);
+                fShimonHeadNodInterval = avgTimeInterval;
                 bIsMoving = true;
                 lMoveStartTimeStamp = System.currentTimeMillis();
+                System.out.println("Tempo is detected!");
+                //after 500 ms, Shimon starts to move
+                startHeadMove((int) fShimonHeadNodInterval / 2);
                 resetAll();
             }
         }
     }
 
-    public void addNewValueToIntervalBuffer (long timeInterval) {
+    /*
+    Append new value to the interval buffer
+     */
+    public void addNewValueToIntervalBuffer(long timeInterval) {
         if (timeInterval > 200 && timeInterval < 2000 && bIsWatching == true && iCurrentNumOfPass < iNumOfPass) {
             llIntervalBuffer.add(timeInterval);
         }
     }
 
+    /*
+    input: the buffern containing several values of time interval
+    output: the average of these values, except the first value
+     */
     public float averageInterval(List<Long> buffer) {
         float sum = 0;
         float mean;
@@ -188,10 +228,20 @@ public class ConductorGesture2Head extends MaxObject {
         llIntervalBuffer.clear();
         ehCurrentDirection = eHandDirection.ArmRight;
         iCurrentNumOfPass = 0;
-        bIsWatching = false;
+//        bIsWatching = false;
         bIsValidData = false;
         lLastTimeStamp = System.currentTimeMillis();
         lSecondLastTimeStamp = System.currentTimeMillis();
+    }
+
+    private void stopBreath() {
+        outlet(5, "/stopBreath");
+        bIsBreath = false;
+    }
+
+    private void startBreath() {
+        outlet(5, "/breathing");
+        bIsBreath = true;
     }
 
     private int bpmConversion(float timeInterval) {
@@ -199,4 +249,42 @@ public class ConductorGesture2Head extends MaxObject {
         return BPMvalue;
     }
 
+    public void startHeadMove(int delay) {
+        tTimer1 = new Timer();
+        tTimer1.schedule(new headNod(), delay);
+    }
+
+    /////////////////////////////////////////////////
+    /////////////////////////////////////////////////
+    class headNod extends TimerTask {
+        long waitTime;
+
+        public void run() {
+            if (bIsBreath) {
+                stopBreath();
+
+//                tTimer1.cancel();
+            }
+            if (iNodCounter < iNodNum) {
+                waitTime = (long) fShimonHeadNodInterval;
+                hipHopMidNod();
+                iNodCounter++;
+                tTimer1.schedule(new headNod(), waitTime);
+            } else if (iNodCounter == iNodNum) {
+                stopNodHead();
+                iNodCounter = 0;
+            }
+        }
+    }
+
+    private void hipHopMidNod() {
+        outlet(2, fShimonHeadNodInterval);
+    }
+
+    private void stopNodHead() {
+        if (bIsMoving) {
+            tTimer1.cancel();
+            bIsMoving = false;
+        }
+    }
 }
