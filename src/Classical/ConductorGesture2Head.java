@@ -37,14 +37,15 @@ public class ConductorGesture2Head extends MaxObject {
     boolean bIsValidData = false;
     boolean bIsBreath = false;
     boolean bIsMoving = false;
+    boolean bIsCapturing = false;
 
-    float fUpperBoundLeftHand = 100.f;
-    float fLowerBoundLeftHand = -100.f;
+    float fUpperBoundLeftHand = 300.f;
+    float fLowerBoundLeftHand = -300.f;
     float fUpperBoundRightHand = 400.f;
     float fLowerBoundRightHand = -400.f;
 
-    float fKeyPointUpperBound = 5.f;
-    float fKeyPointLowerBound = -5.f;
+    float fKeyPointUpperBound = 30.f;
+    float fKeyPointLowerBound = -30.f;
 
     //Constructor: 2 inlet, 6 outlet mxj object
     public ConductorGesture2Head() {
@@ -98,24 +99,52 @@ public class ConductorGesture2Head extends MaxObject {
     }
 
     /*
+    observe the last two values of right hand position in order to get the direction of its movement
+     */
+    public void distinguishDirection(float fPositionData) {
+        fLastPosition = fPositionData;
+        //switch right to left
+        if ((int)fLastPosition < (int)fSecondLastPosition && ehCurrentDirection != eHandDirection.ArmLeft) {
+            ehCurrentDirection = eHandDirection.ArmLeft;
+            System.out.println("Hand direction: right -> left");
+        } else if ((int)fLastPosition > (int)fSecondLastPosition && ehCurrentDirection != eHandDirection.ArmRight) {
+            //switch left to right
+            ehCurrentDirection = eHandDirection.ArmRight;
+            System.out.println("Hand direction: left -> right");
+        }
+        fSecondLastPosition = fLastPosition;
+    }
+
+    /*
     Input: float position data (for example: right hand x axis data)
     Output: number of passing key point
     Caller:
      */
     public void passKeyPoint(float fPositionData) {
         if (fPositionData < fKeyPointUpperBound && fPositionData > fKeyPointLowerBound) {
-            if (fPositionData > (fKeyPointLowerBound + fKeyPointUpperBound) / 2 && ehCurrentDirection == eHandDirection.ArmRight) {
+            if (fPositionData > fKeyPointLowerBound && fPositionData < fKeyPointUpperBound && bIsCapturing == false) {
                 lSecondLastTimeStamp = lLastTimeStamp;
                 lLastTimeStamp = System.currentTimeMillis();
-                ehCurrentDirection = eHandDirection.ArmLeft;
+                bIsCapturing = true;
                 iCurrentNumOfPass += 1;
-                System.out.println("counting!Right to Left");
-            } else if (fPositionData < (fKeyPointLowerBound + fKeyPointUpperBound) / 2 && ehCurrentDirection == eHandDirection.ArmLeft) {
-                lSecondLastTimeStamp = lLastTimeStamp;
-                lLastTimeStamp = System.currentTimeMillis();
-                ehCurrentDirection = eHandDirection.ArmRight;
-                iCurrentNumOfPass += 1;
-                System.out.println("Counting!Left to Right");
+                System.out.println("Counting " + iCurrentNumOfPass + " nth pass!");
+            }
+//            if (fPositionData > (fKeyPointLowerBound + fKeyPointUpperBound) / 2 && ehCurrentDirection == eHandDirection.ArmRight) {
+//                lSecondLastTimeStamp = lLastTimeStamp;
+//                lLastTimeStamp = System.currentTimeMillis();
+//                ehCurrentDirection = eHandDirection.ArmLeft;
+//                iCurrentNumOfPass += 1;
+//                System.out.println("counting!Right to Left");
+//            } else if (fPositionData < (fKeyPointLowerBound + fKeyPointUpperBound) / 2 && ehCurrentDirection == eHandDirection.ArmLeft) {
+//                lSecondLastTimeStamp = lLastTimeStamp;
+//                lLastTimeStamp = System.currentTimeMillis();
+//                ehCurrentDirection = eHandDirection.ArmRight;
+//                iCurrentNumOfPass += 1;
+//                System.out.println("Counting!Left to Right");
+//            }
+        } else if (fPositionData > fKeyPointUpperBound || fPositionData < fKeyPointLowerBound) {
+            if (bIsCapturing == true) {
+                bIsCapturing = false;
             }
         }
     }
@@ -174,7 +203,7 @@ public class ConductorGesture2Head extends MaxObject {
                     stopBreath();
                 }
                 //output number of pass to be used to count the number of Shimon's head movement
-                outlet(4, iNumOfPass);
+                outlet(4, "Shimon is going to reply the conductor by " + iNumOfPass + "times!");
                 //output the time interval which will make Shimon bob his head in the same tempo
 //                outlet(0, avgTimeInterval);
                 fShimonHeadNodInterval = avgTimeInterval;
@@ -278,7 +307,7 @@ public class ConductorGesture2Head extends MaxObject {
     }
 
     private void hipHopMidNod() {
-        outlet(2, fShimonHeadNodInterval);
+        outlet(0, (int)fShimonHeadNodInterval);
     }
 
     private void stopNodHead() {

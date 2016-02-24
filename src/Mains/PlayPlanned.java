@@ -18,6 +18,7 @@ public class PlayPlanned extends MaxObject{
 
     int[][] improvInstructions;
     int improvInstructionCount = 0;
+    int iCurrentVelocity = 0;
 
     //outlets
     int[] ARM_COMMANDS = new int[]{0,1,2,3};
@@ -73,15 +74,13 @@ public class PlayPlanned extends MaxObject{
         improvInstructionCount = 0;
         timeUnitCount=1;
         outputArmCommands(0);
-
     }
-    public void performScript(){
 
+    public void performScript(){
         if(instructionCount < instructions.length){
             outputArmCommands(instructionCount);
             instructionCount++;
             System.out.println("instruction count = "+ instructionCount);
-
         }
     }
 
@@ -105,14 +104,14 @@ public class PlayPlanned extends MaxObject{
             if(instructions[count][i]!=-1){
                 command[2] = 0;
                 if(instructions[count][i] == instructions[count][4]){
-                    command[2] = 43;
+//                    command[2] = 43;
+                    command[2] = iCurrentVelocity;
                 }
                 command[0] = i;
                 command[1] = instructions[count][i];
                 outlet(ARM_COMMANDS[i],command);
             }
         }
-
     }
 
     private void outputArmCommands(int instructionCount){
@@ -123,7 +122,8 @@ public class PlayPlanned extends MaxObject{
                 if(instructions[instructionCount][i]!=-1){
                     command[2] = 0;
                     if(instructions[instructionCount][i] == instructions[instructionCount][4]){
-                        command[2] = 43;
+//                        command[2] = 53;
+                        command[2] = iCurrentVelocity;
                     }
 
                     if(instructions[instructionCount][i] != instructions[instructionCount-1][i] || command[2] != 0){
@@ -139,14 +139,14 @@ public class PlayPlanned extends MaxObject{
                 if(instructions[instructionCount][i]!=-1){
                     command[2] = 0;
                     if(instructions[instructionCount][i] == instructions[instructionCount][4]){
-                        command[2] = 43;
+//                        command[2] = 53;
+                        command[2] = iCurrentVelocity;
                     }
                     command[0] = i;
                     command[1] = instructions[instructionCount][i];
                     outlet(ARM_COMMANDS[i],command);
                 }
             }
-
         }
     }
 
@@ -155,7 +155,6 @@ public class PlayPlanned extends MaxObject{
         if(improvInstructionCount < improvInstructions.length){
             outputImprovArmCommands(improvInstructionCount);
             improvInstructionCount++;
-
         }
     }
 
@@ -166,7 +165,8 @@ public class PlayPlanned extends MaxObject{
                 if(improvInstructions[instructionCount][i]!=-1){
                     command[2] = 0;
                     if(improvInstructions[instructionCount][i] == improvInstructions[instructionCount][4]){
-                        command[2] = 53;
+//                        command[2] = 43;
+                        command[2] = iCurrentVelocity;
                     }
 
                     if(improvInstructions[instructionCount][i] != improvInstructions[instructionCount-1][i] || command[2] != 0){
@@ -182,13 +182,21 @@ public class PlayPlanned extends MaxObject{
                 if(improvInstructions[instructionCount][i]!=-1){
                     command[2] = 0;
                     if(improvInstructions[instructionCount][i] == improvInstructions[instructionCount][4]){
-                        command[2] = 53;
+//                        command[2] = 43;
+                        command[2] = iCurrentVelocity;
                     }
+
                     command[0] = i;
                     command[1] = improvInstructions[instructionCount][i];
                     outlet(ARM_COMMANDS[i],command);
                 }
             }
+        }
+    }
+
+    public void velocityControl(int vel) {
+        if (vel != 0 && vel <= 100) {
+            iCurrentVelocity = vel + 10;
         }
     }
 }
