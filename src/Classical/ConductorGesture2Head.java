@@ -38,6 +38,7 @@ public class ConductorGesture2Head extends MaxObject {
     boolean bIsBreath = false;
     boolean bIsMoving = false;
     boolean bIsCapturing = false;
+    boolean bObjectIsInit = false;
 
     float fUpperBoundLeftHand = 300.f;
     float fLowerBoundLeftHand = -300.f;
@@ -56,6 +57,21 @@ public class ConductorGesture2Head extends MaxObject {
     }
 
     /*
+    Input: Binary value 1 or 0
+    Output: none
+    Turning on or off the entire object
+     */
+    public void objectOnAndOff(int switcher) {
+        if (switcher == 1) {
+            bObjectIsInit = true;
+            System.out.println("The object is activated!");
+        } else if (switcher == 0) {
+            bObjectIsInit = false;
+            System.out.println("The object is sleeping");
+        }
+    }
+
+    /*
     Input: float position data (for example: left hand y axis data)
     Output: none
     switch between the watching and not watching. If left hand is in range, start watching
@@ -63,7 +79,7 @@ public class ConductorGesture2Head extends MaxObject {
     Caller: calculateDuration function
      */
     public void shimonIsWatching(float fPositionData) {
-        if (bIsWatching == false) {
+        if (bIsWatching == false && bObjectIsInit == true) {
             if (fPositionData > fLowerBoundLeftHand && fPositionData < fUpperBoundLeftHand) {
                 bIsWatching = true;
                 System.out.println("Shimon is watching!");
@@ -127,7 +143,7 @@ public class ConductorGesture2Head extends MaxObject {
                 lLastTimeStamp = System.currentTimeMillis();
                 bIsCapturing = true;
                 iCurrentNumOfPass += 1;
-                System.out.println("Counting " + iCurrentNumOfPass + " nth pass!");
+                System.out.println("Counting " + iCurrentNumOfPass + "th pass!");
             }
 //            if (fPositionData > (fKeyPointLowerBound + fKeyPointUpperBound) / 2 && ehCurrentDirection == eHandDirection.ArmRight) {
 //                lSecondLastTimeStamp = lLastTimeStamp;
@@ -188,7 +204,7 @@ public class ConductorGesture2Head extends MaxObject {
         if (!bIsMoving) {
             long duration = 0;
 //            if (shimonIsWatching(fPositionData) == true) {
-            if (bIsWatching) {
+            if (bIsWatching && bObjectIsInit) {
                 float fAfterFilter;
                 fAfterFilter = filterIncomingPositionData(fPositionData);
                 if (bIsValidData == true) {
@@ -301,6 +317,10 @@ public class ConductorGesture2Head extends MaxObject {
                 tTimer1.schedule(new headNod(), waitTime);
                 if (iNodCounter == iNodNum - 1) {
                     outlet(2, "This set of responding is almost finished!");
+                    //set the watching state into false in order to make the synchronization between
+                    //watching state and object activation state. This is for dealing with turning off
+                    //object during shimon's nodding.
+                    bIsWatching = false;
                 }
             } else if (iNodCounter == iNodNum ) {
                 stopNodHead();
