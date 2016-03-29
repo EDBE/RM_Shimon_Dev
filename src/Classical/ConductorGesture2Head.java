@@ -203,7 +203,7 @@ public class ConductorGesture2Head extends MaxObject {
                     stopBreath();
                 }
                 //output number of pass to be used to count the number of Shimon's head movement
-                outlet(4, "Shimon is going to reply the conductor by " + iNumOfPass + "times!");
+                outlet(4, "Shimon is going to reply the conductor by " + iNumOfPass + " times!");
                 //output the time interval which will make Shimon bob his head in the same tempo
 //                outlet(0, avgTimeInterval);
                 fShimonHeadNodInterval = avgTimeInterval;
@@ -227,7 +227,7 @@ public class ConductorGesture2Head extends MaxObject {
     }
 
     /*
-    input: the buffern containing several values of time interval
+    input: the buffer containing several values of time interval
     output: the average of these values, except the first value
      */
     public float averageInterval(List<Long> buffer) {
@@ -264,12 +264,12 @@ public class ConductorGesture2Head extends MaxObject {
     }
 
     private void stopBreath() {
-        outlet(5, "/stopBreath");
+        outlet(1, "/stopBreath");
         bIsBreath = false;
     }
 
     private void startBreath() {
-        outlet(5, "/breathing");
+        outlet(1, "/breathing");
         bIsBreath = true;
     }
 
@@ -299,7 +299,10 @@ public class ConductorGesture2Head extends MaxObject {
                 hipHopMidNod();
                 iNodCounter++;
                 tTimer1.schedule(new headNod(), waitTime);
-            } else if (iNodCounter == iNodNum) {
+                if (iNodCounter == iNodNum - 1) {
+                    outlet(2, "This set of responding is almost finished!");
+                }
+            } else if (iNodCounter == iNodNum ) {
                 stopNodHead();
                 iNodCounter = 0;
             }

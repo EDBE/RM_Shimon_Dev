@@ -17,16 +17,16 @@ public class EEG2Head extends MaxObject{
     int iHeadRotateCounter  = 0;
     float f2ndDeriValue     = 0.f;
     float f1stDeriValue     = 0.f;
-    float f1stLowerBound    = -20.f;
-    float f1stUpperBound    = 20.f;
-    float f2ndLowerBound    = -15.f;
-    float f2ndUpperBound    = 15.f;
-    float f1stKeyPoint      = 10.f;
-    float f2ndKeyPoint      = 10.f;
+    float f1stLowerBound    = -700.f;
+    float f1stUpperBound    = 700.f;
+    float f2ndLowerBound    = -700.f;
+    float f2ndUpperBound    = 700.f;
+    float f1stKeyPoint      = 220.f;
+    float f2ndKeyPoint      = 130.f;
     float fBasePanAmp       = 0.3f;
-    float fBasePanVel       = iHeadNodInterval / 2;
+    float fBasePanVel       = iHeadNodInterval;
     float fNeckPanAmp       = 0.3f;
-    float fNeckPanVel       = iHeadNodInterval;
+    float fNeckPanVel       = iHeadNodInterval * .75f;
 
     boolean bIsMoving       = false;
     boolean bIsBreath       = false;
@@ -45,7 +45,7 @@ public class EEG2Head extends MaxObject{
         System.out.println("The EEG2Head mxj object is updated!");
     }
 
-    private void resetAll() {
+    public void resetAll() {
         bIsMoving        = false;
         iBPM             = 0;
         iHeadNodCounter  = 0;
@@ -77,6 +77,8 @@ public class EEG2Head extends MaxObject{
         if (Math.abs(keyPoint) < f1stUpperBound) {
             System.out.println("key point for 1st derivative is set!");
             f1stKeyPoint = Math.abs(keyPoint);
+        } else {
+            System.out.println("key point is out of boundary");
         }
     }
 
@@ -84,6 +86,8 @@ public class EEG2Head extends MaxObject{
         if (Math.abs(keyPoint) < f2ndUpperBound) {
             System.out.println("key point for 2nd derivative is set!");
             f2ndKeyPoint = Math.abs(keyPoint);
+        } else {
+            System.out.println("key point is out of boundary");
         }
     }
 
@@ -93,6 +97,8 @@ public class EEG2Head extends MaxObject{
             if (!bIsBreath) {
                 outlet(5, "/breathing");
                 bIsBreath = true;
+                tTimer1 = new Timer();
+                tTimer2 = new Timer();
             }
             bIsMoving = true;
         } else if (iBPM == 0) {
@@ -103,6 +109,7 @@ public class EEG2Head extends MaxObject{
     public void stop() {
         if (bIsMoving == true) {
             tTimer1.cancel();
+            tTimer2.cancel();
             if (bIsBreath) {
                 outlet(5, "/stopBreath");
             }
@@ -115,15 +122,20 @@ public class EEG2Head extends MaxObject{
     Using neck tilt to follow the beat of the piece
      */
     public void startHeadNod(int delay) {
-        tTimer1 = new Timer();
         tTimer1.schedule(new headNod(), delay);
     }
 
     public void startHeadGesture(int delay) {
-        tTimer2 = new Timer();
         tTimer2.schedule(new headGesture(), delay);
     }
 
+    /*
+    Taking the first derivative of teh original signal in, compare the value with multiple ranges.
+    If the value matches the range, change the amplitude of neckpan and basepan.
+    1, Value from low -> high: amplitude increase
+    2, Value from high -> low: amplitude decrease
+    adding some random factors to make the a few more variations
+    */
     public void firstDerMapping(float firstDer) {
         if (bIsMoving) {
             if (firstDer > f1stLowerBound && firstDer < f1stUpperBound) {
@@ -133,9 +145,15 @@ public class EEG2Head extends MaxObject{
                         float randomValue = rRandomGenerator.nextFloat();
                         if (randomValue > 0.2f) {
                             fNeckPanAmp = 0.8f;
-                            if (randomValue > 0.7f) {
+                            if (randomValue > 0.5f) {
                                 fBasePanAmp = 0.6f;
+                                if (randomValue > 0.7) {
+                                    fNeckPanAmp = 1.1f;
+                                    fBasePanAmp = 0.7f;
+                                }
                                 if (!bIsNodding) {
+                                    //Robot starts to move the head when the data coming in
+                                    //before the data come in, robot only breath
                                     startHeadNod(iHeadNodInterval);
                                     bIsNodding = true;
                                 }
@@ -145,7 +163,7 @@ public class EEG2Head extends MaxObject{
                 } else if (Math.abs(firstDer) < f1stDeriValue) {
                     if (Math.abs(f1stDeriValue) > f1stKeyPoint) {
                         // decrease the base pan amplitude, and decrease the neck pan amplitude
-                        fNeckPanAmp = 0.2f;
+                        fNeckPanAmp = 0.4f;
                         fBasePanAmp = 0.2f;
                     }
                 }
@@ -153,11 +171,18 @@ public class EEG2Head extends MaxObject{
 
                 if (bIsBreath && bIsMoving) {
                     outlet(5, "/stopBreath");
+                    bIsBreath = false;
                 }
             }
         }
     }
-
+    /*
+    Taking the second derivative of the original signal in, compare the value with multiple range.
+    If the value matches the range, change the velocity of neckpan and basepan.
+    1, Value from low -> high: velocity increase
+    2, Value from high -> low: velocity decrease
+    adding some random factors to make the a few more variations
+     */
     public void secondDerMapping(float secondDer) {
         if (bIsMoving) {
             if (secondDer > f2ndLowerBound && secondDer < f2ndUpperBound) {
@@ -165,23 +190,35 @@ public class EEG2Head extends MaxObject{
                 if (Math.abs(secondDer) > f2ndKeyPoint && Math.abs(f2ndDeriValue) < f2ndKeyPoint) {
                  // increase the base pan velocity, or increase the neck pan velocity or both
                     if (randomValue > 0.2f) {
-                        fNeckPanVel = 1.5f * iHeadNodInterval;
-                        if (randomValue > 0.8f) {
-                            fBasePanVel = 0.75f * iHeadNodInterval;
+                        fNeckPanVel = 0.6f * iHeadNodInterval;
+                        if (randomValue > 0.5f) {
+                            fBasePanVel = 0.8f * iHeadNodInterval;
+                            if (randomValue > 0.7f) {
+                                fNeckPanVel = 0.5f * iHeadNodInterval;
+                                fBasePanVel = 0.75f * iHeadNodInterval;
+                            }
                         }
                     }
 
                 } else if (Math.abs(secondDer) < f2ndKeyPoint && Math.abs(f2ndDeriValue) > f2ndKeyPoint) {
                     if (randomValue > 0.2f) {
                         fNeckPanVel = iHeadNodInterval;
-                        if (randomValue > 0.8) {
-                            fBasePanVel = 0.5f * iHeadNodInterval;
+                        if (randomValue > 0.5) {
+                            fBasePanVel = 1.15f * iHeadNodInterval;
+                            if (randomValue > 0.8f) {
+                                fNeckPanVel = 1.1f * iHeadNodInterval;
+                                fBasePanVel = 1.25f * iHeadNodInterval;
+                            }
                         }
                     }
                 }
                 f2ndDeriValue = secondDer;
-                if(iHeadNodCounter >= 12) {
-
+                if(iHeadNodCounter >= 4) {
+                    if(!bIsBreath && bIsMoving && bIsNodding) {
+                        startHeadGesture(4 * iHeadNodInterval);
+                        iHeadNodCounter = 0;
+//                        System.out.println("the neckpan velocity is " + fNeckPanVel + " and the basepan velocity is " + fBasePanVel);
+                    }
                 }
             }
         }
@@ -190,7 +227,7 @@ public class EEG2Head extends MaxObject{
     class headNod extends TimerTask {
         long waitTime;
         public void run() {
-            waitTime = iHeadNodInterval;
+            waitTime = 2*iHeadNodInterval;
             outlet(3, iHeadNodInterval);
             iHeadNodCounter++;
             tTimer1.schedule(new headNod(), waitTime);
@@ -198,31 +235,34 @@ public class EEG2Head extends MaxObject{
     }
 
     class headGesture extends TimerTask {
-        List<Float> lfNeckPan2 = new ArrayList<Float>(2);
-        List<Float> lfBasePan2 = new ArrayList<Float>(2);
+
+        float [] afNeckPan2 = new float[2];
+        float [] afBasePan2 = new float[2];
 
         long waitTime;
 
         public void run() {
-            lfBasePan2.clear();
-            lfNeckPan2.clear();
+//            System.out.println("headGesutre timer task is being called.");
+            // switch between the positive and negtive value of amplitude
             if (iHeadRotateCounter % 2 == 0) {
-                lfBasePan2.add(0, fBasePanAmp);
-                lfBasePan2.add(1, fBasePanVel);
-                lfNeckPan2.add(0, fNeckPanAmp);
-                lfNeckPan2.add(1, fNeckPanVel);
+                afBasePan2[0] = fBasePanAmp;
+                afBasePan2[1] = fBasePanVel;
+                afNeckPan2[0] = fNeckPanAmp;
+                afNeckPan2[1] = fNeckPanVel;
             } else {
-                lfBasePan2.add(0, -fBasePanAmp);
-                lfBasePan2.add(1, fBasePanVel);
-                lfNeckPan2.add(0, -fNeckPanAmp);
-                lfNeckPan2.add(1, fNeckPanVel);
+                afBasePan2[0] = -fBasePanAmp;
+                afBasePan2[1] = fBasePanVel;
+                afNeckPan2[0] = -fNeckPanAmp;
+                afNeckPan2[1] = fNeckPanVel;
             }
             iHeadRotateCounter++;
-            outlet(1, (Atom)lfBasePan2);
-            outlet(2, (Atom)lfNeckPan2);
+            outlet(2, afNeckPan2);
+            outlet(1, afBasePan2);
 
-            waitTime = iHeadNodInterval;
-            tTimer2.schedule(new headGesture(), waitTime);
+            waitTime = 4 * iHeadNodInterval;
+            if (iHeadRotateCounter % 5 == 0) {
+                tTimer2.schedule(new headGesture(), waitTime);
+            }
         }
 
     }

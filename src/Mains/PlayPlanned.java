@@ -27,7 +27,7 @@ public class PlayPlanned extends MaxObject{
     public PlayPlanned(Atom[] args)
     {
         declareInlets(new int[]{DataTypes.ALL});
-        declareOutlets(new int[]{DataTypes.ALL,DataTypes.ALL,DataTypes.ALL,DataTypes.ALL});
+        declareOutlets(new int[]{DataTypes.ALL,DataTypes.ALL,DataTypes.ALL,DataTypes.ALL, DataTypes.ALL});
         System.out.println("PlayPlanned mxj object is updated!!!");
     }
 
@@ -58,12 +58,14 @@ public class PlayPlanned extends MaxObject{
     }
 
 
-    public void loadScript(){
+    public void loadScript(String scoreFile){
 
-        ReadFile fileReader = new ReadFile("/Users/musictechnology/Dropbox/1_Spring_2016/7100MUSI/WeeklyDemo/2.24/liang_song/liang_song_p1_instructions.txt");
+//        ReadFile fileReader = new ReadFile("/Users/musictechnology/Dropbox/1_Spring_2016/7100MUSI/WeeklyDemo/3.2/liang_song/liang_song_p1_instructions.txt");
+//        ReadFile fileReader = new ReadFile("/Users/musictechnology/Dropbox/1_Spring_2016/7100MUSI/WeeklyDemo/3.9/PathPlan/liang_song_p2_instructions.txt");
+        ReadFile fileReader = new ReadFile(scoreFile);
         List<String> lines = new ArrayList<String>(fileReader.getLines());
         instructions = fileReader.interpretScript(lines);
-        System.out.println("melody script loaded, instruction count = "+instructions.length);
+        System.out.println("melody script loaded, instruction count = " + instructions.length);
 
     }
 
@@ -82,6 +84,11 @@ public class PlayPlanned extends MaxObject{
             instructionCount++;
             System.out.println("instruction count = "+ instructionCount);
         }
+    }
+
+    public void performScriptFrom (int counter) {
+        instructionCount = counter;
+        performScript();
     }
 
     public void performNonMidiScript(){
@@ -104,12 +111,13 @@ public class PlayPlanned extends MaxObject{
             if(instructions[count][i]!=-1){
                 command[2] = 0;
                 if(instructions[count][i] == instructions[count][4]){
-//                    command[2] = 43;
-                    command[2] = iCurrentVelocity;
+                    command[2] = 43;
+//                    command[2] = iCurrentVelocity;
                 }
                 command[0] = i;
                 command[1] = instructions[count][i];
                 outlet(ARM_COMMANDS[i],command);
+
             }
         }
     }
@@ -122,14 +130,17 @@ public class PlayPlanned extends MaxObject{
                 if(instructions[instructionCount][i]!=-1){
                     command[2] = 0;
                     if(instructions[instructionCount][i] == instructions[instructionCount][4]){
-//                        command[2] = 53;
-                        command[2] = iCurrentVelocity;
+                        command[2] = 53;
+//                        command[2] = iCurrentVelocity;
                     }
 
                     if(instructions[instructionCount][i] != instructions[instructionCount-1][i] || command[2] != 0){
                         command[0] = i;
                         command[1] = instructions[instructionCount][i];
                         outlet(ARM_COMMANDS[i],command);
+                        if (command[2] != 0) {
+                            outlet(4, command[1]);
+                        }
                     }
 
                 }
@@ -139,12 +150,15 @@ public class PlayPlanned extends MaxObject{
                 if(instructions[instructionCount][i]!=-1){
                     command[2] = 0;
                     if(instructions[instructionCount][i] == instructions[instructionCount][4]){
-//                        command[2] = 53;
-                        command[2] = iCurrentVelocity;
+                        command[2] = 53;
+//                        command[2] = iCurrentVelocity;
                     }
                     command[0] = i;
                     command[1] = instructions[instructionCount][i];
                     outlet(ARM_COMMANDS[i],command);
+                    if (command[2] != 0) {
+                        outlet(4, command[1]);
+                    }
                 }
             }
         }
@@ -195,8 +209,8 @@ public class PlayPlanned extends MaxObject{
     }
 
     public void velocityControl(int vel) {
-        if (vel != 0 && vel <= 100) {
-            iCurrentVelocity = vel + 10;
+        if (vel != 0 && vel <= 80) {
+            iCurrentVelocity = vel + 5;
         }
     }
 }
