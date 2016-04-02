@@ -212,7 +212,7 @@ public class head_move_to_tempo extends MaxObject {
     }
 
     public void lookRight() {
-        outlet(0, 1.f);
+        outlet(0, .4f);
 //        outlet(2, 835);
     }
 
@@ -237,15 +237,16 @@ public class head_move_to_tempo extends MaxObject {
             if (nodCount <= 11) {
                 if (nodCount < 11) {
                     // look human player first
-                    lookLeft();
-                    System.out.println("I am looking left");
+//                    lookLeft();
+                    lookRight();
+                    System.out.println("I am looking right");
 //                } else if (nodCount > 48 && nodCount < 64) {
 //                    // look center
 ////                    lookCenter();
 //                    lookRight();
                     System.out.println("I am looking right");
                 } else {
-                    lookLeft();
+                    lookCenter();
                     System.out.println("I am looking center");
                 }
                 nodCount++;

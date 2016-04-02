@@ -316,7 +316,7 @@ public class ConductorGesture2Head extends MaxObject {
                 iNodCounter++;
                 tTimer1.schedule(new headNod(), waitTime);
                 if (iNodCounter == iNodNum - 1) {
-                    outlet(2, "This set of responding is almost finished!");
+                    outlet(2, "This set of gesutures is almost finished!");
                     //set the watching state into false in order to make the synchronization between
                     //watching state and object activation state. This is for dealing with turning off
                     //object during shimon's nodding.

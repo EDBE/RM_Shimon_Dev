@@ -111,8 +111,16 @@ public class PlayPlanned extends MaxObject{
             if(instructions[count][i]!=-1){
                 command[2] = 0;
                 if(instructions[count][i] == instructions[count][4]){
-                    command[2] = 43;
+                    if (ARM_COMMANDS[i] == 0) {
+                        command[2] = 45;
+                    } else if (ARM_COMMANDS[i] == 1) {
+                        command[2] = 37;
+                    } else if (ARM_COMMANDS[i] == 2){
+                        command[2] = 55;
 //                    command[2] = iCurrentVelocity;
+                    } else {
+                        command[2] = 45;
+                    }
                 }
                 command[0] = i;
                 command[1] = instructions[count][i];
@@ -130,8 +138,16 @@ public class PlayPlanned extends MaxObject{
                 if(instructions[instructionCount][i]!=-1){
                     command[2] = 0;
                     if(instructions[instructionCount][i] == instructions[instructionCount][4]){
-                        command[2] = 53;
-//                        command[2] = iCurrentVelocity;
+                        if (ARM_COMMANDS[i] == 0) {
+                            command[2] = 45;
+                        } else if (ARM_COMMANDS[i] == 1) {
+                            command[2] = 52;
+                        } else if (ARM_COMMANDS[i] == 2){
+                            command[2] = 50;
+//                    command[2] = iCurrentVelocity;
+                        } else {
+                            command[2] = 45;
+                        }
                     }
 
                     if(instructions[instructionCount][i] != instructions[instructionCount-1][i] || command[2] != 0){
@@ -150,8 +166,16 @@ public class PlayPlanned extends MaxObject{
                 if(instructions[instructionCount][i]!=-1){
                     command[2] = 0;
                     if(instructions[instructionCount][i] == instructions[instructionCount][4]){
-                        command[2] = 53;
-//                        command[2] = iCurrentVelocity;
+                        if (ARM_COMMANDS[i] == 0) {
+                            command[2] = 45;
+                        } else if (ARM_COMMANDS[i] == 1) {
+                            command[2] = 37;
+                        } else if (ARM_COMMANDS[i] == 2){
+                            command[2] = 55;
+//                    command[2] = iCurrentVelocity;
+                        } else {
+                            command[2] = 45;
+                        }
                     }
                     command[0] = i;
                     command[1] = instructions[instructionCount][i];
