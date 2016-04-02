@@ -23,6 +23,13 @@ public class PlayPlanned extends MaxObject{
     //outlets
     int[] ARM_COMMANDS = new int[]{0,1,2,3};
 
+    //velocity control
+    int iArm0Vel = 45;
+    int iArm1Vel = 52;
+    int iArm2Vel = 50;
+    int iArm3Vel = 45;
+
+    int iVelocityRange = 2;
 
     public PlayPlanned(Atom[] args)
     {
@@ -139,14 +146,13 @@ public class PlayPlanned extends MaxObject{
                     command[2] = 0;
                     if(instructions[instructionCount][i] == instructions[instructionCount][4]){
                         if (ARM_COMMANDS[i] == 0) {
-                            command[2] = 45;
+                            command[2] = iArm0Vel;
                         } else if (ARM_COMMANDS[i] == 1) {
-                            command[2] = 52;
+                            command[2] = iArm1Vel;
                         } else if (ARM_COMMANDS[i] == 2){
-                            command[2] = 50;
-//                    command[2] = iCurrentVelocity;
+                            command[2] = iArm2Vel;
                         } else {
-                            command[2] = 45;
+                            command[2] = iArm3Vel;
                         }
                     }
 
@@ -232,9 +238,27 @@ public class PlayPlanned extends MaxObject{
         }
     }
 
-    public void velocityControl(int vel) {
-        if (vel != 0 && vel <= 80) {
-            iCurrentVelocity = vel + 5;
+    public void velocityControl(String s) {
+        if (s.equalsIgnoreCase("low")) {
+            iArm0Vel = 40;
+            iArm1Vel = 45;
+            iArm2Vel = 45;
+            iArm3Vel = 40;
+            System.out.println("playing softly");
+        } else if(s.equalsIgnoreCase("mid")) {
+            iArm0Vel = 50;
+            iArm1Vel = 55;
+            iArm2Vel = 55;
+            iArm3Vel = 50;
+            System.out.println("playing mid");
+        } else if(s.equalsIgnoreCase("high")) {
+            iArm0Vel = 60;
+            iArm1Vel = 65;
+            iArm2Vel = 65;
+            iArm3Vel = 60;
+            System.out.println("playing strongly");
+        } else {
+            //
         }
     }
 }
