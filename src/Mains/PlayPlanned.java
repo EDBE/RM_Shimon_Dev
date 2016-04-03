@@ -89,7 +89,7 @@ public class PlayPlanned extends MaxObject{
         if(instructionCount < instructions.length){
             outputArmCommands(instructionCount);
             instructionCount++;
-            System.out.println("instruction count = "+ instructionCount);
+//            System.out.println("instruction count = "+ instructionCount);
         }
     }
 
@@ -119,14 +119,14 @@ public class PlayPlanned extends MaxObject{
                 command[2] = 0;
                 if(instructions[count][i] == instructions[count][4]){
                     if (ARM_COMMANDS[i] == 0) {
-                        command[2] = 45;
+                        command[2] = 0;
                     } else if (ARM_COMMANDS[i] == 1) {
-                        command[2] = 37;
+                        command[2] = 0;
                     } else if (ARM_COMMANDS[i] == 2){
-                        command[2] = 55;
+                        command[2] = 0;
 //                    command[2] = iCurrentVelocity;
                     } else {
-                        command[2] = 45;
+                        command[2] = 0;
                     }
                 }
                 command[0] = i;
@@ -173,14 +173,14 @@ public class PlayPlanned extends MaxObject{
                     command[2] = 0;
                     if(instructions[instructionCount][i] == instructions[instructionCount][4]){
                         if (ARM_COMMANDS[i] == 0) {
-                            command[2] = 45;
+                            command[2] = iArm0Vel;
                         } else if (ARM_COMMANDS[i] == 1) {
-                            command[2] = 37;
+                            command[2] = iArm1Vel;
                         } else if (ARM_COMMANDS[i] == 2){
-                            command[2] = 55;
+                            command[2] = iArm2Vel;
 //                    command[2] = iCurrentVelocity;
                         } else {
-                            command[2] = 45;
+                            command[2] = iArm3Vel;
                         }
                     }
                     command[0] = i;
@@ -239,23 +239,23 @@ public class PlayPlanned extends MaxObject{
     }
 
     public void velocityControl(String s) {
-        if (s.equalsIgnoreCase("low")) {
+        if (s.equals("low")) {
             iArm0Vel = 40;
-            iArm1Vel = 45;
-            iArm2Vel = 45;
-            iArm3Vel = 40;
-            System.out.println("playing softly");
-        } else if(s.equalsIgnoreCase("mid")) {
-            iArm0Vel = 50;
-            iArm1Vel = 55;
-            iArm2Vel = 55;
-            iArm3Vel = 50;
-            System.out.println("playing mid");
-        } else if(s.equalsIgnoreCase("high")) {
-            iArm0Vel = 60;
-            iArm1Vel = 65;
-            iArm2Vel = 65;
+            iArm1Vel = 70;
+            iArm2Vel = 40;
             iArm3Vel = 60;
+            System.out.println("playing softly");
+        } else if(s.equals("mid")) {
+            iArm0Vel = 50;
+            iArm1Vel = 80;
+            iArm2Vel = 50;
+            iArm3Vel = 70;
+            System.out.println("playing mid");
+        } else if(s.equals("high")) {
+            iArm0Vel = 60;
+            iArm1Vel = 100;
+            iArm2Vel = 70;
+            iArm3Vel = 80;
             System.out.println("playing strongly");
         } else {
             //

@@ -4,6 +4,9 @@ import com.cycling74.max.Atom;
 import com.cycling74.max.DataTypes;
 import com.cycling74.max.MaxObject;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 /**
  * Created by Liang on 3/31/16.
  */
@@ -14,6 +17,7 @@ public class MorningCloud_StructManager extends MaxObject {
     int iTempoRange = 20;
     int iEventNum   = 0;
     int iPathPlanSection = 1;
+    int iSwitchModeMessageCounter = 0;
 
     long lLastTime;
 
@@ -21,8 +25,12 @@ public class MorningCloud_StructManager extends MaxObject {
 
     String sScoreLabel;
 
-    boolean bVelCtlIsWaiting = true;
+    boolean bVelCtlIsWaiting = false;
     boolean bVelCtlIsResponding = false;
+    boolean bIsPathPlaning = false;
+
+    Timer tSwitchModeTask;
+
     /*
     Constructor: declare the input and output of the object
     2 inputs, 4 outputs
@@ -44,7 +52,7 @@ public class MorningCloud_StructManager extends MaxObject {
         declareOutlets(new int[]{DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL});
         lLastTime = System.currentTimeMillis();
         reset();
-        System.out.println("MorningCloud_StructManager Object is updated!" + bVelCtlIsWaiting + bVelCtlIsResponding);
+        System.out.println("MorningCloud_StructManager Object is updated!");
     }
 
     /*
@@ -55,12 +63,15 @@ public class MorningCloud_StructManager extends MaxObject {
         iInitialBPM = 90;
         iTempoRange = 20;
         iEventNum   = 0;
-        iPathPlanSection = 1;
+        iSwitchModeMessageCounter = 0;
 
         fGlobalBeat = 0.f;
 
+        sScoreLabel = "";
+
         bVelCtlIsWaiting = true;
         bVelCtlIsResponding = false;
+        bIsPathPlaning = true;
     }
 
     /*
@@ -122,6 +133,12 @@ public class MorningCloud_StructManager extends MaxObject {
             sScoreLabel = s;
             System.out.println("The score label is " + sScoreLabel);
             velocityVariation();
+            // manage play mode switching
+            if (sScoreLabel.equals("e68")) {
+                pathPlanOff();
+            } else if (sScoreLabel.equals("dummy")) {//need to figure this one out
+                pathPlanOn();
+            }
         }
     }
 
@@ -130,70 +147,89 @@ public class MorningCloud_StructManager extends MaxObject {
     }
 
     /*
-    Input: message -- 'tracking'
+    Input: message -- 'velocityVariation'
      */
     private void velocityVariation() {
         // First section of path planing
-        if (sScoreLabel.equals("e1")&& bVelCtlIsWaiting == true && bVelCtlIsResponding == false) {
-            pathPlanVelLow();
-            bVelCtlIsResponding = true;
-            bVelCtlIsWaiting = false;
-            System.out.println("Test1");
-        } else if (sScoreLabel.equals("e8")){
-            pathPlanVelMid();
-        } else if (sScoreLabel.equals("e16")) {
-            pathPlanVelHigh();
-        } else if (sScoreLabel.equals("e18")) {
-            pathPlanVelMid();
-        } else if (sScoreLabel.equals("e104")) {
-            pathPlanVelLow();
-        } else if (sScoreLabel.equals("e23")) {
-            pathPlanVelMid();
-        } else if (sScoreLabel.equals("e30")) {
-            pathPlanVelLow();
-        } else if (sScoreLabel.equals("e34")) {
-            pathPlanVelMid();
-        } else if (sScoreLabel.equals("e36")) {
-            pathPlanVelHigh();
-        } else if (sScoreLabel.equals("e43")) {
-            pathPlanVelMid();
-        } else if (sScoreLabel.equals("e48")) {
-            pathPlanVelHigh();
-        } else if (sScoreLabel.equals("e51")) {
-            pathPlanVelMid();
-        } else if (sScoreLabel.equals("e54")) {
-            pathPlanVelLow();
-        } else if (sScoreLabel.equals("e61")) {
-            pathPlanVelMid();
-        } else if (sScoreLabel.equals("e66")) {
-            pathPlanVelLow();
-            bVelCtlIsResponding = false;
-            bVelCtlIsWaiting = true;
+        if (iPathPlanSection == 1) {
+            if (sScoreLabel.equals("e1") && bVelCtlIsWaiting == true && bVelCtlIsResponding == false) {
+                pathPlanVelLow();
+                bVelCtlIsResponding = true;
+                bVelCtlIsWaiting = false;
+                System.out.println("Test1");
+            } else if (sScoreLabel.equals("e8")) {
+                pathPlanVelMid();
+            } else if (sScoreLabel.equals("e16")) {
+                pathPlanVelHigh();
+            } else if (sScoreLabel.equals("e18")) {
+                pathPlanVelMid();
+            } else if (sScoreLabel.equals("e104")) {
+                pathPlanVelLow();
+            } else if (sScoreLabel.equals("e23")) {
+                pathPlanVelMid();
+            } else if (sScoreLabel.equals("e30")) {
+                pathPlanVelLow();
+            } else if (sScoreLabel.equals("e34")) {
+                pathPlanVelMid();
+            } else if (sScoreLabel.equals("e36")) {
+                pathPlanVelHigh();
+            } else if (sScoreLabel.equals("e43")) {
+                pathPlanVelMid();
+            } else if (sScoreLabel.equals("e48")) {
+                pathPlanVelHigh();
+            } else if (sScoreLabel.equals("e51")) {
+                pathPlanVelMid();
+            } else if (sScoreLabel.equals("e54")) {
+                pathPlanVelLow();
+            } else if (sScoreLabel.equals("e61")) {
+                pathPlanVelMid();
+            } else if (sScoreLabel.equals("e66")) {
+                pathPlanVelLow();
+                bVelCtlIsResponding = false;
+                bVelCtlIsWaiting = true;
+            }
+        } else if (iPathPlanSection == 2) {
+
+            //Second section of path planing
+            if (sScoreLabel.equals("ee1") && !bVelCtlIsResponding && bVelCtlIsWaiting) {
+                pathPlanVelMid();
+            } else if (sScoreLabel.equals("ee5")) {
+                pathPlanVelHigh();
+            } else if (sScoreLabel.equals("ee7")) {
+                pathPlanVelLow();
+            } else if (sScoreLabel.equals("ee26")) {
+                pathPlanVelMid();
+            } else if (sScoreLabel.equals("ee30")) {
+                pathPlanVelHigh();
+            } else if (sScoreLabel.equals("ee36")) {
+                pathPlanVelMid();
+            } else if (sScoreLabel.equals("ee41")) {
+                pathPlanVelLow();
+            } else if (sScoreLabel.equals("ee44")) {
+                pathPlanVelHigh();
+            } else if (sScoreLabel.equals("ee45")) {
+                pathPlanVelLow();
+            } else if (sScoreLabel.equals("ee46")) {
+                pathPlanVelHigh();
+            }
         }
 
-        //Second section of path planing
-        if (sScoreLabel.equals("ee1") && !bVelCtlIsResponding && bVelCtlIsWaiting) {
-            pathPlanVelMid();
-        } else if (sScoreLabel.equals("ee5")) {
-            pathPlanVelHigh();
-        } else if (sScoreLabel.equals("ee7")) {
-            pathPlanVelLow();
-        } else if (sScoreLabel.equals("ee26")) {
-            pathPlanVelMid();
-        } else if (sScoreLabel.equals("ee30")) {
-            pathPlanVelHigh();
-        } else if (sScoreLabel.equals("ee36")) {
-            pathPlanVelMid();
-        } else if (sScoreLabel.equals("ee41")) {
-            pathPlanVelLow();
-        } else if (sScoreLabel.equals("ee44")) {
-            pathPlanVelHigh();
-        } else if (sScoreLabel.equals("ee45")) {
-            pathPlanVelLow();
-        } else if (sScoreLabel.equals("ee46")) {
-            pathPlanVelHigh();
-        }
+    }
 
+    /*
+    Input: message -- 'switchmode'
+     */
+    private void pathPlanOff() {
+        if (bIsPathPlaning) {
+            tSwitchModeTask = new Timer();
+            tSwitchModeTask.schedule(new SwitchModeOn2Off(), 100);
+        }
+    }
+    private void pathPlanOn() {
+        if (!bIsPathPlaning) {
+            tSwitchModeTask = new Timer();
+            tSwitchModeTask.schedule(new SwitchModeOff2On(), 100);
+        }
     }
 
     /*
@@ -215,4 +251,48 @@ public class MorningCloud_StructManager extends MaxObject {
         outlet(1, "high");
     }
 
+    class SwitchModeOn2Off extends TimerTask {
+        long waitTime = 150;
+        public void run() {
+            if(bIsPathPlaning) {
+                if (iSwitchModeMessageCounter < 5) {
+                    outlet(2, "/pathPlaningOFF");
+
+                } else {
+                    bIsPathPlaning = false;
+                    outlet(3, 0);//load the midi score that is numbered with 0
+                }
+            }
+            if (iSwitchModeMessageCounter >= 5) {
+                tSwitchModeTask.cancel();
+                System.out.println("Path Planing OFF");
+                iSwitchModeMessageCounter = 0;
+            } else {
+                tSwitchModeTask.schedule(new SwitchModeOn2Off(), waitTime);
+                iSwitchModeMessageCounter++;
+            }
+        }
+    }
+    class SwitchModeOff2On extends TimerTask {
+        long waitTime = 150;
+        public void run() {
+            if(!bIsPathPlaning) {
+                if (iSwitchModeMessageCounter < 5) {
+                    outlet(2, "/pathPlaningON");
+
+                } else {
+                    bIsPathPlaning = false;
+                    outlet(4, "1");
+                }
+            }
+            if (iSwitchModeMessageCounter >= 5) {
+                tSwitchModeTask.cancel();
+                System.out.println("Path Planing OFF");
+                iSwitchModeMessageCounter = 0;
+            } else {
+                tSwitchModeTask.schedule(new SwitchModeOff2On(), waitTime);
+                iSwitchModeMessageCounter++;
+            }
+        }
+    }
 }
