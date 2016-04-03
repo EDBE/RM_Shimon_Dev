@@ -59,9 +59,6 @@ public class MorningCloud_StructManager extends MaxObject {
     Reset: reset all of the parameters
      */
     public void reset() {
-        iRealTimeTempo = 0;
-        iInitialBPM = 90;
-        iTempoRange = 20;
         iEventNum   = 0;
         iSwitchModeMessageCounter = 0;
 

@@ -10,9 +10,10 @@ import java.util.*;
  */
 
 public class head_move_to_tempo extends MaxObject {
-    Timer timer1 = new Timer();
-    Timer timer2 = new Timer();
-    Random rand = new Random();
+    Timer timer1;
+    Timer timer2;
+    Random rand;
+
     volatile List<Float> realTimeTempoBuffer = new ArrayList<Float>();
 
     int scoreBPM = 88;   //set BPM by score
@@ -20,16 +21,19 @@ public class head_move_to_tempo extends MaxObject {
     int beatPosition = 1;
     int pitchNum = 0;
     int Accompaniment_Event_Num = 0;
-    long lastTime;
-    volatile boolean listening = true;
-    volatile boolean breath = false;
-    //    volatile boolean playing = true;
-    float headNodInterval;
     int behaviorNodCount = 0;
     int nodCount = 0;
     int nodType = 2;
-
     int countNodA = 0;
+
+    long lastTime;
+    volatile boolean listening = true;
+    volatile boolean breath = false;
+
+    //    volatile boolean playing = true;
+    float headNodInterval;
+
+
 
     //constructor: declare the input and output of the object
     //2 inputs, and 5 outputs
@@ -47,6 +51,21 @@ public class head_move_to_tempo extends MaxObject {
         declareInlets(new int[]{DataTypes.ALL, DataTypes.ALL});
         declareOutlets(new int[]{DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL});
         lastTime = System.currentTimeMillis();
+        reset();
+    }
+
+    /*
+    Reset all of the parameters
+     */
+    public void reset() {
+        scoreBPM = 88;   //set BPM by score
+        lastSeveralNotes = 5;
+        beatPosition = 1;
+        pitchNum = 0;
+        Accompaniment_Event_Num = 0;
+        behaviorNodCount = 0;
+        nodCount = 0;
+        nodType = 2;
     }
 
     /*
@@ -164,7 +183,7 @@ public class head_move_to_tempo extends MaxObject {
     input: tempo value
     output: time interval of quarter note in million second
      */
-    public float intervalCalculation(float tempo) {
+    private float intervalCalculation(float tempo) {
         float interval = 60000 / tempo;
         return interval;
     }
@@ -173,7 +192,7 @@ public class head_move_to_tempo extends MaxObject {
     input: arraylist of tempo, the number of tempo would be calculate
     output: mean of last several tempo value (float)
      */
-    public float smoothedTempo(List<Float> tempoBuffer, int numberOfValue) {
+    private float smoothedTempo(List<Float> tempoBuffer, int numberOfValue) {
         float sum = 0;
         float mean;
         if (tempoBuffer.size() < numberOfValue && tempoBuffer.size() >= 0) {
@@ -335,6 +354,7 @@ public class head_move_to_tempo extends MaxObject {
         public void run() {
                 //nodType = 1;
             headNodInterval *= 1;
+            rand = new Random();
             if (rand.nextFloat() > .5f) {
 //                    float lookAtPosition = rand.nextFloat() * 2 - 1.1f;
 //                    float lookAtPosition = rand.nextFloat() * 1.1f - 1.1f;
