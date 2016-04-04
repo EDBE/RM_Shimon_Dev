@@ -21,16 +21,19 @@ public class NoddingHeadWithTempo extends MaxObject {
     int iValidTempoRange = 20;
     int iNumOfNoteObserve = 3;
     int iNodCounter = 0;
-    int iNodeType = -1;
+    int iNodeType = 2;
     int iNumOfInputNote = 0;
+    int iNthTimesTempo = 1;
 
     long lLastTime;
 
     float fHeadNodInterval = 0.f;
 
     boolean bObjectOnOff = false;
-    boolean bIsListening = false;
+    boolean bIsListening = true;
     boolean bIsResponding = false;
+    boolean bNewNodIntervalReady = false;
+    boolean bAutoBasePan = false;
 
     volatile List<Float> lfRealtimeTempo = new ArrayList<Float>();
 
@@ -68,18 +71,23 @@ public class NoddingHeadWithTempo extends MaxObject {
         iNumOfNoteObserve = 3;
         iNumOfInputNote = 0;
         iNodCounter = 0;
-        iNodeType = -1;
+        iNodeType = 2;
+        iNthTimesTempo = 1;
 
         fHeadNodInterval = 0.f;
 
-        bIsListening = false;
+        bIsListening = true;
         bIsResponding = false;
         bObjectOnOff = false;
-
-        lfRealtimeTempo.clear();
+        bNewNodIntervalReady = false;
+        bAutoBasePan = false;
 
         if (tHeadTempoMoving == null) {
             tHeadTempoMoving = new Timer();
+        }
+
+        if (lfRealtimeTempo.isEmpty() == false) {
+            lfRealtimeTempo.clear();
         }
     }
 
@@ -90,14 +98,25 @@ public class NoddingHeadWithTempo extends MaxObject {
     public void objectOnAndOff (int toggle) {
         if (toggle == 1 && bObjectOnOff == false) {
             bObjectOnOff = true;
+            bIsListening = true;
+            bIsResponding = false;
+            bNewNodIntervalReady = false;
             if (tHeadTempoMoving == null) {
                 tHeadTempoMoving = new Timer();
             }
+            System.out.println("HeadNodding object is ON!!!");
         } else if (toggle == 0 && bObjectOnOff == true) {
             bObjectOnOff = false;
+            bIsListening = false;
+            bIsResponding = false;
+            iNthTimesTempo = 1;
             if (tHeadTempoMoving != null) {
                 tHeadTempoMoving.cancel();
             }
+            if(!(lfRealtimeTempo.isEmpty())) {
+                lfRealtimeTempo.clear();
+            }
+            System.out.println("HeadNodding object is OFF!!!");
         }
         outlet(0, bObjectOnOff);
     }
@@ -130,15 +149,39 @@ public class NoddingHeadWithTempo extends MaxObject {
     * setter of the iNodeType, in order to send out the message at corresponding
     * outlet index
      */
-    public void setNodeType(String s) {
-        if (s.equals("Low")) {
+    public void setNodType(String s) {
+        if (s.equals("Low") && iNodeType != 1) {
             iNodeType = 1;
-        } else if (s.equals("Mid")) {
+        } else if (s.equals("Mid") && iNodeType != 2) {
             iNodeType = 2;
-        } else if (s.equals("High")) {
+        } else if (s.equals("High") && iNodeType != 3) {
             iNodeType = 3;
         }
         System.out.println("Head move is " + iNodeType);
+    }
+
+    /*Input: boolean -- setAutoBase
+    * Setter of bAutoBasePan
+    */
+    public void setAutoBase(int toggle) {
+        if (bAutoBasePan==false && toggle == 1) {
+            bAutoBasePan = true;
+            outlet(4, "/autoBasepan"); // need to check for the message
+        } else if (bAutoBasePan == true && toggle == 0) {
+            bAutoBasePan = false;
+            outlet(4, "/autoBasepan");
+        }
+    }
+
+    /* Input: integer -- the ratio between beats per measure and nod per measure
+    * if you want to have robot nod twice per measure in a 4/4 piece, set this value to 2
+    */
+    public void setNthTimes(int nthTimes) {
+        if (nthTimes > 0 && nthTimes < 8 && nthTimes != iNthTimesTempo) {
+            iNthTimesTempo = nthTimes;
+        } else {
+            System.out.println("Invalid nth times value");
+        }
     }
 
     /*
@@ -148,6 +191,7 @@ public class NoddingHeadWithTempo extends MaxObject {
         if (tHeadTempoMoving != null) {
             tHeadTempoMoving.cancel();
         }
+//        bIsResponding = false;
     }
 
     /*
@@ -157,7 +201,7 @@ public class NoddingHeadWithTempo extends MaxObject {
      */
     public void listenToTempo(float tempo) {
         if(bObjectOnOff) {
-            if(bIsListening) {
+            if (bIsListening) {
                 if (iNumOfNoteObserve > iNumOfInputNote) {
                     if (tempo > (iInitialBPM - iValidTempoRange) && tempo < (iInitialBPM + iValidTempoRange)) {
                         lfRealtimeTempo.add(tempo);
@@ -167,15 +211,24 @@ public class NoddingHeadWithTempo extends MaxObject {
                     fHeadNodInterval = intervalCalculation(smoothedTempo(lfRealtimeTempo, iNumOfNoteObserve));
                     System.out.println("The interval of nodding is " + fHeadNodInterval);
                     iNumOfInputNote = 0;
+                    bNewNodIntervalReady = true;
+
                 }
             }
 
-            if (!bIsResponding) {
-                // suppose start the timer task here
-                tHeadTempoMoving.schedule(new HeadNod(), (long) fHeadNodInterval);
-                bIsResponding = true;
+            if (bNewNodIntervalReady) {
+                if (!bIsResponding) {
+                    // suppose start the timer task here
+                    startHeadNod((long)(fHeadNodInterval/2));
+                    bIsResponding = true;
+                }
             }
         }
+    }
+
+    public void startHeadNod(long delay) {
+        tHeadTempoMoving = new Timer();
+        tHeadTempoMoving.schedule(new HeadNod(), delay);
     }
 
     /*
@@ -211,19 +264,10 @@ public class NoddingHeadWithTempo extends MaxObject {
     class HeadNod extends TimerTask {
         long lWaitTime;
         public void run() {
-            if (iNodCounter < 2 * iNumOfNoteObserve) {
-                if (iNodCounter == iNumOfNoteObserve) {
-                    bIsListening = true;
-                }
-                lWaitTime = (int) fHeadNodInterval;
-                outlet(iNodeType, fHeadNodInterval); //1->low, 2->mid, 3->high
-                iNodCounter++;
-                tHeadTempoMoving.schedule(new HeadNod(), lWaitTime);
-            } else {
-                tHeadTempoMoving.cancel();
-                iNodCounter = 0;
-                bIsResponding = false;
-            }
+            lWaitTime = (long) (fHeadNodInterval * iNthTimesTempo);
+            outlet(iNodeType, fHeadNodInterval); //1->low, 2->mid, 3->high
+            iNodCounter++;
+            tHeadTempoMoving.schedule(new HeadNod(), lWaitTime);
         }
     }
 
