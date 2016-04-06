@@ -17,7 +17,7 @@ import java.util.*;
  */
 public class NoddingHeadWithTempo extends MaxObject {
     int iRealTimeTempo = 0;
-    int iInitialBPM = 90;
+    int iInitialBPM = 95;
     int iValidTempoRange = 20;
     int iNumOfNoteObserve = 3;
     int iNodCounter = 0;
@@ -166,10 +166,10 @@ public class NoddingHeadWithTempo extends MaxObject {
     public void setAutoBase(int toggle) {
         if (bAutoBasePan==false && toggle == 1) {
             bAutoBasePan = true;
-            outlet(4, "/autoBasepan"); // need to check for the message
+            outlet(4, "/autoBasePan"); // need to check for the message
         } else if (bAutoBasePan == true && toggle == 0) {
             bAutoBasePan = false;
-            outlet(4, "/autoBasepan");
+            outlet(4, "/autoBasePan");
         }
     }
 

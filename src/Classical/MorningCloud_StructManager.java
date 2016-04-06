@@ -24,12 +24,14 @@ public class MorningCloud_StructManager extends MaxObject {
     float fGlobalBeat = 0.f;
 
     String sScoreLabel;
+    String sCurrentRobotVelocity = "Mid";
 
     boolean bVelCtlIsWaiting = false;
     boolean bVelCtlIsResponding = false;
     boolean bIsPathPlaning = false;
     boolean bKinectIsOn = false;
     boolean bHeadIsFollowHand = false;
+    boolean bHeadIsNormalNod = false;
 
     Timer tSwitchModeTask;
 
@@ -51,7 +53,7 @@ public class MorningCloud_StructManager extends MaxObject {
         Output 4:
          */
         declareInlets(new int[]{DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL});
-        declareOutlets(new int[]{DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL});
+        declareOutlets(new int[]{DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL});
         lLastTime = System.currentTimeMillis();
         reset();
         System.out.println("MorningCloud_StructManager Object is updated!");
@@ -67,11 +69,13 @@ public class MorningCloud_StructManager extends MaxObject {
         fGlobalBeat = 0.f;
 
         sScoreLabel = "";
+        sCurrentRobotVelocity = "Mid";
 
         bVelCtlIsWaiting = true;
         bVelCtlIsResponding = false;
         bIsPathPlaning = true;
         bHeadIsFollowHand = false;
+        bHeadIsNormalNod = false;
     }
 
     /*
@@ -107,13 +111,13 @@ public class MorningCloud_StructManager extends MaxObject {
     }
 
     /*
-    Input: float numver -- real time tempo and global beat
+    Input: float number -- real time tempo and global beat
      */
     public void inlet(float f) {
         int inletIdx;
         inletIdx = getInlet();
         if (inletIdx == 2) {
-            if(f!= iRealTimeTempo) {
+            if(f != iRealTimeTempo) {
                 if (f < iInitialBPM + iTempoRange && f > iInitialBPM + iTempoRange) {
                     iRealTimeTempo = (int) f;
 //                    System.out.println("I am getting value of " + iRealTimeTempo + " from " + inletIdx);
@@ -133,6 +137,7 @@ public class MorningCloud_StructManager extends MaxObject {
             sScoreLabel = s;
             System.out.println("The score label is " + sScoreLabel);
             headFollowHand();
+            normalHeadNod();
             velocityVariation();
             // manage play mode switching
             if (sScoreLabel.equals("e68")) {
@@ -157,7 +162,6 @@ public class MorningCloud_StructManager extends MaxObject {
                 pathPlanVelLow();
                 bVelCtlIsResponding = true;
                 bVelCtlIsWaiting = false;
-                System.out.println("Test1");
             } else if (sScoreLabel.equals("e8")) {
                 pathPlanVelMid();
             } else if (sScoreLabel.equals("e16")) {
@@ -294,23 +298,55 @@ public class MorningCloud_StructManager extends MaxObject {
         }
     }
 
+
+    /*
+    Robot's head follows the real-time tempo and velocity to make nodding gestures
+    This cannot be used at the same time with the HeadFollowHand function
+     */
+    private void normalHeadNod() {
+        if (!bHeadIsFollowHand) {
+            if (sScoreLabel.equals("e5")) {
+                normalHeadNodSwitcher(true);
+            }
+        }
+        if (bHeadIsNormalNod) {
+            outlet(8, sCurrentRobotVelocity);
+        }
+    }
+    /*
+    Switcher of the function of normal head nodding
+     */
+    private void normalHeadNodSwitcher(boolean b) {
+        if (!bHeadIsNormalNod && b == true) {
+            bHeadIsNormalNod = b;
+            outlet(7, 1);
+        } else if(bHeadIsNormalNod && b == false) {
+            bHeadIsNormalNod = b;
+            outlet(7, 0);
+        }
+        System.out.println("Normal head nod is " + bHeadIsNormalNod);
+    }
+
     /*
     Output velocity level at second outlet
      */
     private void pathPlanVelLow() {
         outlet(1, "low");
+        sCurrentRobotVelocity = "Low";
     }
     /*
     Output velocity level at second outlet
      */
     private void pathPlanVelMid() {
         outlet(1, "mid");
+        sCurrentRobotVelocity = "Mid";
     }
     /*
     Output velocity level at second outlet
      */
     private void pathPlanVelHigh() {
         outlet(1, "high");
+        sCurrentRobotVelocity = "High";
     }
 
     class SwitchModeOn2Off extends TimerTask {
