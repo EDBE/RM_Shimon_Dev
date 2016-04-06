@@ -28,6 +28,7 @@ public class MorningCloud_StructManager extends MaxObject {
     boolean bVelCtlIsWaiting = false;
     boolean bVelCtlIsResponding = false;
     boolean bIsPathPlaning = false;
+    boolean bKinectIsOn = false;
 
     Timer tSwitchModeTask;
 
@@ -129,6 +130,7 @@ public class MorningCloud_StructManager extends MaxObject {
         if (!s.equals(sScoreLabel)) {
             sScoreLabel = s;
             System.out.println("The score label is " + sScoreLabel);
+
             velocityVariation();
             // manage play mode switching
             if (sScoreLabel.equals("e68")) {
@@ -226,6 +228,37 @@ public class MorningCloud_StructManager extends MaxObject {
         if (!bIsPathPlaning) {
             tSwitchModeTask = new Timer();
             tSwitchModeTask.schedule(new SwitchModeOff2On(), 100);
+        }
+    }
+
+    /*
+    * Kinect switcher
+    * Output 1 when user wants to have the kinect work, otherwise, output 0
+     */
+    public void initialKinect() {
+        if (!bKinectIsOn) {
+            outlet(5, 1);
+        } else {
+            System.out.println("Kinect is already ON!");
+        }
+    }
+    public void stopKinect() {
+        if (bKinectIsOn) {
+            outlet(5, 0);
+        } else {
+            System.out.println("Kinect is already OFF!");
+        }
+    }
+
+    /*
+    Kinect working condition
+    If the string return from the Kinect-Shimon patch is identical to the target
+    the Kinect is ON, otherwise Kinect is not working properly.
+     */
+    public void kinectCondition(String s) {
+        if (s.equals("read jit.openni_config.xml 1")) {
+            System.out.println("Kinect is turning ON!!!");
+            bKinectIsOn = true;
         }
     }
 
