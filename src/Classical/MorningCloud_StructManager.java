@@ -29,6 +29,7 @@ public class MorningCloud_StructManager extends MaxObject {
     boolean bVelCtlIsResponding = false;
     boolean bIsPathPlaning = false;
     boolean bKinectIsOn = false;
+    boolean bHeadIsFollowHand = false;
 
     Timer tSwitchModeTask;
 
@@ -50,7 +51,7 @@ public class MorningCloud_StructManager extends MaxObject {
         Output 4:
          */
         declareInlets(new int[]{DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL});
-        declareOutlets(new int[]{DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL});
+        declareOutlets(new int[]{DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL});
         lLastTime = System.currentTimeMillis();
         reset();
         System.out.println("MorningCloud_StructManager Object is updated!");
@@ -70,6 +71,7 @@ public class MorningCloud_StructManager extends MaxObject {
         bVelCtlIsWaiting = true;
         bVelCtlIsResponding = false;
         bIsPathPlaning = true;
+        bHeadIsFollowHand = false;
     }
 
     /*
@@ -130,7 +132,7 @@ public class MorningCloud_StructManager extends MaxObject {
         if (!s.equals(sScoreLabel)) {
             sScoreLabel = s;
             System.out.println("The score label is " + sScoreLabel);
-
+            headFollowHand();
             velocityVariation();
             // manage play mode switching
             if (sScoreLabel.equals("e68")) {
@@ -245,6 +247,7 @@ public class MorningCloud_StructManager extends MaxObject {
     public void stopKinect() {
         if (bKinectIsOn) {
             outlet(5, 0);
+            bKinectIsOn = false;
         } else {
             System.out.println("Kinect is already OFF!");
         }
@@ -255,10 +258,41 @@ public class MorningCloud_StructManager extends MaxObject {
     If the string return from the Kinect-Shimon patch is identical to the target
     the Kinect is ON, otherwise Kinect is not working properly.
      */
-    public void kinectCondition(String s) {
-        if (s.equals("read jit.openni_config.xml 1")) {
+    public void kinectCondition(int i) {
+        if (i == 1) {
             System.out.println("Kinect is turning ON!!!");
             bKinectIsOn = true;
+        } else {
+            bKinectIsOn = false;
+            System.out.println("Fails to turn Kinect ON");
+        }
+    }
+
+    /*
+    Robot head follows human's hand movement
+    Swiching this function on at particular time
+     */
+    private void headFollowHand() {
+        if (!bHeadIsFollowHand) {
+            if (sScoreLabel.equals("measure1")) {
+                HeadFollowHandSwitcher(true);
+            } else if (sScoreLabel.equals("e3")) {
+                HeadFollowHandSwitcher(false);
+            }
+        }
+    }
+    /*
+    Switching the head following hand function ON and OFF
+     */
+    private void HeadFollowHandSwitcher(boolean b) {
+        if (b != bHeadIsFollowHand) {
+            bHeadIsFollowHand = b;
+            if(bHeadIsFollowHand == true) {
+                outlet(6, 1);
+            } else {
+                outlet(6, 0);
+            }
+            System.out.println("Head follows hand is " + bHeadIsFollowHand);
         }
     }
 
