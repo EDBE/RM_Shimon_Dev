@@ -273,12 +273,10 @@ public class MorningCloud_StructManager extends MaxObject {
     Swiching this function on at particular time
      */
     private void headFollowHand() {
-        if (!bHeadIsFollowHand) {
-            if (sScoreLabel.equals("measure1")) {
-                HeadFollowHandSwitcher(true);
-            } else if (sScoreLabel.equals("e3")) {
-                HeadFollowHandSwitcher(false);
-            }
+        if (sScoreLabel.equals("measure1")) {
+            HeadFollowHandSwitcher(true);
+        } else if (sScoreLabel.equals("e3")) {
+            HeadFollowHandSwitcher(false);
         }
     }
     /*
