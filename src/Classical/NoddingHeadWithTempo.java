@@ -110,6 +110,7 @@ public class NoddingHeadWithTempo extends MaxObject {
             bIsListening = false;
             bIsResponding = false;
             iNthTimesTempo = 1;
+            setAutoBase(0);
             if (tHeadTempoMoving != null) {
                 tHeadTempoMoving.cancel();
             }
@@ -166,10 +167,10 @@ public class NoddingHeadWithTempo extends MaxObject {
     public void setAutoBase(int toggle) {
         if (bAutoBasePan==false && toggle == 1) {
             bAutoBasePan = true;
-            outlet(4, "/autoBasePan"); // need to check for the message
+            outlet(4, "/autoBasePan 1"); // need to check for the message
         } else if (bAutoBasePan == true && toggle == 0) {
             bAutoBasePan = false;
-            outlet(4, "/autoBasePan");
+            outlet(4, "/autoBasePan 0");
         }
     }
 
@@ -212,7 +213,6 @@ public class NoddingHeadWithTempo extends MaxObject {
                     System.out.println("The interval of nodding is " + fHeadNodInterval);
                     iNumOfInputNote = 0;
                     bNewNodIntervalReady = true;
-
                 }
             }
 

@@ -32,6 +32,8 @@ public class MorningCloud_StructManager extends MaxObject {
     boolean bKinectIsOn = false;
     boolean bHeadIsFollowHand = false;
     boolean bHeadIsNormalNod = false;
+    boolean bIsAutoBasePan = false;
+    boolean bHeadIsSpecialMove = false;
 
     Timer tSwitchModeTask;
 
@@ -53,7 +55,7 @@ public class MorningCloud_StructManager extends MaxObject {
         Output 4:
          */
         declareInlets(new int[]{DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL});
-        declareOutlets(new int[]{DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL});
+        declareOutlets(new int[]{DataTypes.ALL,DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL});
         lLastTime = System.currentTimeMillis();
         reset();
         System.out.println("MorningCloud_StructManager Object is updated!");
@@ -76,6 +78,7 @@ public class MorningCloud_StructManager extends MaxObject {
         bIsPathPlaning = true;
         bHeadIsFollowHand = false;
         bHeadIsNormalNod = false;
+        bIsAutoBasePan = false;
     }
 
     /*
@@ -136,9 +139,9 @@ public class MorningCloud_StructManager extends MaxObject {
         if (!s.equals(sScoreLabel)) {
             sScoreLabel = s;
             System.out.println("The score label is " + sScoreLabel);
-            headFollowHand();
-            normalHeadNod();
-            velocityVariation();
+            headFollowHand();   //communicate with head follows hand patch
+            normalHeadNod();    //communicate with nodding head patch
+            velocityVariation();//communicate with path planning patch
             // manage play mode switching
             if (sScoreLabel.equals("e68")) {
                 pathPlanOff();
@@ -218,7 +221,6 @@ public class MorningCloud_StructManager extends MaxObject {
                 pathPlanVelHigh();
             }
         }
-
     }
 
     /*
@@ -227,13 +229,13 @@ public class MorningCloud_StructManager extends MaxObject {
     private void pathPlanOff() {
         if (bIsPathPlaning) {
             tSwitchModeTask = new Timer();
-            tSwitchModeTask.schedule(new SwitchModeOn2Off(), 100);
+            tSwitchModeTask.schedule(new SwitchModeOn2Off(), 500);
         }
     }
     private void pathPlanOn() {
         if (!bIsPathPlaning) {
             tSwitchModeTask = new Timer();
-            tSwitchModeTask.schedule(new SwitchModeOff2On(), 100);
+            tSwitchModeTask.schedule(new SwitchModeOff2On(), 500);
         }
     }
 
@@ -277,9 +279,13 @@ public class MorningCloud_StructManager extends MaxObject {
     Swiching this function on at particular time
      */
     private void headFollowHand() {
-        if (sScoreLabel.equals("measure1")) {
+        if (sScoreLabel.equals("s")) {
             HeadFollowHandSwitcher(true);
         } else if (sScoreLabel.equals("e3")) {
+            HeadFollowHandSwitcher(false);
+        } else if (sScoreLabel.equals("measure31")) {
+            HeadFollowHandSwitcher(true);
+        } else if (sScoreLabel.equals("e34")) {
             HeadFollowHandSwitcher(false);
         }
     }
@@ -298,19 +304,51 @@ public class MorningCloud_StructManager extends MaxObject {
         }
     }
 
-
     /*
     Robot's head follows the real-time tempo and velocity to make nodding gestures
     This cannot be used at the same time with the HeadFollowHand function
      */
     private void normalHeadNod() {
+        // turn the normal head nod object ON or OFF
         if (!bHeadIsFollowHand) {
             if (sScoreLabel.equals("e5")) {
                 normalHeadNodSwitcher(true);
+            } else if (sScoreLabel.equals("e30")) {
+                normalHeadNodSwitcher(false);
+            } else if (sScoreLabel.equals("e35")) {
+                normalHeadNodSwitcher(true);
+            } else if (sScoreLabel.equals("e38")) {
+                normalHeadNodSwitcher(false);
+            } else if (sScoreLabel.equals("e43")) {
+                normalHeadNodSwitcher(true);
+            } else if (sScoreLabel.equals("e50")) {
+                normalHeadNodSwitcher(false);
+            } else if (sScoreLabel.equals("e54")) {
+                normalHeadNodSwitcher(true);
+            } else if (sScoreLabel.equals("e66")) {
+                normalHeadNodSwitcher(false);
             }
         }
+        // if the object is ON, then map the current velocity to the amplitude of the nod
         if (bHeadIsNormalNod) {
             outlet(8, sCurrentRobotVelocity);
+        }
+        // turn ON or OFF auto base pan at particular point. The auto base pan behaviour is
+        // independent to the nod head essentially
+        if (sScoreLabel.equals("e8")) {
+            normalHeadNodBasePan(1);
+        } else if (sScoreLabel.equals("e104")) {
+            normalHeadNodBasePan(0);
+        } else if (sScoreLabel.equals("e21")) {
+            normalHeadNodBasePan(1);
+        } else if (sScoreLabel.equals("measure28")) {
+            normalHeadNodBasePan(0);
+        } else if (sScoreLabel.equals("e35")) {
+            normalHeadNodBasePan(1);
+        } else if (sScoreLabel.equals("e51")) {
+            normalHeadNodBasePan(0);
+        } else if (sScoreLabel.equals("e66")) {
+            normalHeadNodBasePan(1);
         }
     }
     /*
@@ -325,6 +363,27 @@ public class MorningCloud_StructManager extends MaxObject {
             outlet(7, 0);
         }
         System.out.println("Normal head nod is " + bHeadIsNormalNod);
+    }
+    /*
+    Turn on or off the auto base pan
+     */
+    private void normalHeadNodBasePan(int toggle) {
+        if (!bIsAutoBasePan && toggle == 1) {
+            outlet(9, 1);
+            bIsAutoBasePan = true;
+        } else if (bIsAutoBasePan && toggle == 0) {
+            outlet(9, 0);
+            bIsAutoBasePan = false;
+        }
+    }
+
+    /*
+    Robot's head creats some special gestures like varied speed of head up and down,
+    exaggerated blinking
+     */
+    private void specialHeadMove() {
+        //starting at: e39,    e50,
+        //ending at:   e42(43),e54,
     }
 
     /*
@@ -350,11 +409,11 @@ public class MorningCloud_StructManager extends MaxObject {
     }
 
     class SwitchModeOn2Off extends TimerTask {
-        long waitTime = 150;
+        long waitTime = 800;
         public void run() {
             if(bIsPathPlaning) {
                 if (iSwitchModeMessageCounter < 5) {
-                    outlet(2, "/pathPlaningOFF");
+                    outlet(2, "/pathPlaningOFF 1");
 
                 } else {
                     bIsPathPlaning = false;
@@ -364,6 +423,7 @@ public class MorningCloud_StructManager extends MaxObject {
             if (iSwitchModeMessageCounter >= 5) {
                 tSwitchModeTask.cancel();
                 System.out.println("Path Planing OFF");
+                outlet(10, "start");
                 iSwitchModeMessageCounter = 0;
             } else {
                 tSwitchModeTask.schedule(new SwitchModeOn2Off(), waitTime);
@@ -372,20 +432,19 @@ public class MorningCloud_StructManager extends MaxObject {
         }
     }
     class SwitchModeOff2On extends TimerTask {
-        long waitTime = 150;
+        long waitTime = 800;
         public void run() {
             if(!bIsPathPlaning) {
                 if (iSwitchModeMessageCounter < 5) {
-                    outlet(2, "/pathPlaningON");
-
+                    outlet(2, "/pathPlaningON 1");
                 } else {
-                    bIsPathPlaning = false;
-                    outlet(4, "1");
+                    bIsPathPlaning = true;
+                    outlet(4, 1);
                 }
             }
             if (iSwitchModeMessageCounter >= 5) {
                 tSwitchModeTask.cancel();
-                System.out.println("Path Planing OFF");
+                System.out.println("Path Planing On");
                 iSwitchModeMessageCounter = 0;
             } else {
                 tSwitchModeTask.schedule(new SwitchModeOff2On(), waitTime);
