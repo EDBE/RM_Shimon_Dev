@@ -311,22 +311,38 @@ public class MorningCloud_StructManager extends MaxObject {
     private void normalHeadNod() {
         // turn the normal head nod object ON or OFF
         if (!bHeadIsFollowHand) {
-            if (sScoreLabel.equals("e5")) {
-                normalHeadNodSwitcher(true);
-            } else if (sScoreLabel.equals("e30")) {
-                normalHeadNodSwitcher(false);
-            } else if (sScoreLabel.equals("e35")) {
-                normalHeadNodSwitcher(true);
-            } else if (sScoreLabel.equals("e38")) {
-                normalHeadNodSwitcher(false);
-            } else if (sScoreLabel.equals("e43")) {
-                normalHeadNodSwitcher(true);
-            } else if (sScoreLabel.equals("e50")) {
-                normalHeadNodSwitcher(false);
-            } else if (sScoreLabel.equals("e54")) {
-                normalHeadNodSwitcher(true);
-            } else if (sScoreLabel.equals("e66")) {
-                normalHeadNodSwitcher(false);
+            if (iPathPlanSection == 1) {
+                if (sScoreLabel.equals("e5")) {
+                    normalHeadNodSwitcher(true);
+                } else if (sScoreLabel.equals("e30")) {
+                    normalHeadNodSwitcher(false);
+                } else if (sScoreLabel.equals("e35")) {
+                    normalHeadNodSwitcher(true);
+                } else if (sScoreLabel.equals("e38")) {
+                    normalHeadNodSwitcher(false);
+                } else if (sScoreLabel.equals("e43")) {
+                    normalHeadNodSwitcher(true);
+                } else if (sScoreLabel.equals("e50")) {
+                    normalHeadNodSwitcher(false);
+                } else if (sScoreLabel.equals("e54")) {
+                    normalHeadNodSwitcher(true);
+                } else if (sScoreLabel.equals("e66")) {
+                    normalHeadNodSwitcher(false);
+                }
+            } else if (iPathPlanSection == 2) {
+                if (sScoreLabel.equals("ee2")) {
+                    normalHeadNodSwitcher(true);
+                } else if (sScoreLabel.equals("ee9")) {
+                    normalHeadNodSwitcher(false);
+                } else if (sScoreLabel.equals("ee22")) {
+                    normalHeadNodSwitcher(true);
+                } else if (sScoreLabel.equals("ee29")) {
+                    normalHeadNodSwitcher(false);
+                } else if (sScoreLabel.equals("ee43")) {
+                    normalHeadNodSwitcher(true);
+                } else if (sScoreLabel.equals("ee46")) {
+                    normalHeadNodSwitcher(false);
+                }
             }
         }
         // if the object is ON, then map the current velocity to the amplitude of the nod
@@ -335,20 +351,36 @@ public class MorningCloud_StructManager extends MaxObject {
         }
         // turn ON or OFF auto base pan at particular point. The auto base pan behaviour is
         // independent to the nod head essentially
-        if (sScoreLabel.equals("e8")) {
-            normalHeadNodBasePan(1);
-        } else if (sScoreLabel.equals("e104")) {
-            normalHeadNodBasePan(0);
-        } else if (sScoreLabel.equals("e21")) {
-            normalHeadNodBasePan(1);
-        } else if (sScoreLabel.equals("measure28")) {
-            normalHeadNodBasePan(0);
-        } else if (sScoreLabel.equals("e35")) {
-            normalHeadNodBasePan(1);
-        } else if (sScoreLabel.equals("e51")) {
-            normalHeadNodBasePan(0);
-        } else if (sScoreLabel.equals("e66")) {
-            normalHeadNodBasePan(1);
+        if (iPathPlanSection == 1) {
+            if (sScoreLabel.equals("e8")) {
+                normalHeadNodBasePan(1);
+            } else if (sScoreLabel.equals("e104")) {
+                normalHeadNodBasePan(0);
+            } else if (sScoreLabel.equals("e21")) {
+                normalHeadNodBasePan(1);
+            } else if (sScoreLabel.equals("measure28")) {
+                normalHeadNodBasePan(0);
+            } else if (sScoreLabel.equals("e35")) {
+                normalHeadNodBasePan(1);
+            } else if (sScoreLabel.equals("e51")) {
+                normalHeadNodBasePan(0);
+            } else if (sScoreLabel.equals("e66")) {
+                normalHeadNodBasePan(1);
+            }
+        } else if (iPathPlanSection == 2) {
+            if (sScoreLabel.equals("ee2")) {
+                normalHeadNodBasePan(1);
+            } else if (sScoreLabel.equals("ee9")) {
+                normalHeadNodBasePan(0);
+            } else if (sScoreLabel.equals("ee22")) {
+                normalHeadNodBasePan(1);
+            } else if (sScoreLabel.equals("ee29")) {
+                normalHeadNodBasePan(0);
+            } else if (sScoreLabel.equals("ee35")) {
+                normalHeadNodBasePan(1);
+            } else if (sScoreLabel.equals("ee46")) {
+                normalHeadNodBasePan(0);
+            }
         }
     }
     /*
@@ -382,8 +414,8 @@ public class MorningCloud_StructManager extends MaxObject {
     exaggerated blinking
      */
     private void specialHeadMove() {
-        //starting at: e39,    e50,
-        //ending at:   e42(43),e54,
+        //starting at: e39,    e50; ee9,  ee30, ee46(ending of the piece)
+        //ending at:   e42(43),e54; ee21, ee42,
     }
 
     /*
