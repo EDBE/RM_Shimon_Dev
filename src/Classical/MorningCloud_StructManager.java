@@ -55,10 +55,11 @@ public class MorningCloud_StructManager extends MaxObject {
         Output 4:
          */
         declareInlets(new int[]{DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL});
-        declareOutlets(new int[]{DataTypes.ALL,DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL});
+        declareOutlets(new int[]{DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL});
         lLastTime = System.currentTimeMillis();
-        reset();
+
         System.out.println("MorningCloud_StructManager Object is updated!");
+        reset();
     }
 
     /*
@@ -67,6 +68,7 @@ public class MorningCloud_StructManager extends MaxObject {
     public void reset() {
         iEventNum   = 0;
         iSwitchModeMessageCounter = 0;
+        iPathPlanSection = 1;
 
         fGlobalBeat = 0.f;
 
@@ -79,6 +81,8 @@ public class MorningCloud_StructManager extends MaxObject {
         bHeadIsFollowHand = false;
         bHeadIsNormalNod = false;
         bIsAutoBasePan = false;
+
+        outlet(2, "/pathPlanningON 1");
     }
 
     /*
@@ -229,13 +233,13 @@ public class MorningCloud_StructManager extends MaxObject {
     private void pathPlanOff() {
         if (bIsPathPlaning) {
             tSwitchModeTask = new Timer();
-            tSwitchModeTask.schedule(new SwitchModeOn2Off(), 500);
+            tSwitchModeTask.schedule(new SwitchModeOn2Off(), 2500);
         }
     }
     private void pathPlanOn() {
         if (!bIsPathPlaning) {
             tSwitchModeTask = new Timer();
-            tSwitchModeTask.schedule(new SwitchModeOff2On(), 500);
+            tSwitchModeTask.schedule(new SwitchModeOff2On(), 2000);
         }
     }
 
@@ -366,6 +370,8 @@ public class MorningCloud_StructManager extends MaxObject {
                 normalHeadNodBasePan(0);
             } else if (sScoreLabel.equals("e66")) {
                 normalHeadNodBasePan(1);
+            } else if (sScoreLabel.equals("e68")) {
+                normalHeadNodBasePan(0);
             }
         } else if (iPathPlanSection == 2) {
             if (sScoreLabel.equals("ee2")) {
@@ -401,10 +407,10 @@ public class MorningCloud_StructManager extends MaxObject {
      */
     private void normalHeadNodBasePan(int toggle) {
         if (!bIsAutoBasePan && toggle == 1) {
-            outlet(9, 1);
+            outlet(9, "/autoBasePan 1");
             bIsAutoBasePan = true;
         } else if (bIsAutoBasePan && toggle == 0) {
-            outlet(9, 0);
+            outlet(9, "/autoBasePan 0");
             bIsAutoBasePan = false;
         }
     }
@@ -441,11 +447,11 @@ public class MorningCloud_StructManager extends MaxObject {
     }
 
     class SwitchModeOn2Off extends TimerTask {
-        long waitTime = 800;
+        long waitTime = 500;
         public void run() {
             if(bIsPathPlaning) {
                 if (iSwitchModeMessageCounter < 5) {
-                    outlet(2, "/pathPlaningOFF 1");
+                    outlet(2, "/pathPlanningOFF 1");
 
                 } else {
                     bIsPathPlaning = false;
@@ -455,7 +461,8 @@ public class MorningCloud_StructManager extends MaxObject {
             if (iSwitchModeMessageCounter >= 5) {
                 tSwitchModeTask.cancel();
                 System.out.println("Path Planing OFF");
-                outlet(10, "start");
+//                outlet(10, "start");      //using 'detonate' to play back midi
+                outlet(10, "start 1024");   //using 'seq' object to play back midi
                 iSwitchModeMessageCounter = 0;
             } else {
                 tSwitchModeTask.schedule(new SwitchModeOn2Off(), waitTime);
@@ -464,11 +471,11 @@ public class MorningCloud_StructManager extends MaxObject {
         }
     }
     class SwitchModeOff2On extends TimerTask {
-        long waitTime = 800;
+        long waitTime = 500;
         public void run() {
             if(!bIsPathPlaning) {
                 if (iSwitchModeMessageCounter < 5) {
-                    outlet(2, "/pathPlaningON 1");
+                    outlet(2, "/pathPlanningON 1");
                 } else {
                     bIsPathPlaning = true;
                     outlet(4, 1);
