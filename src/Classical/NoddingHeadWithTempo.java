@@ -109,7 +109,6 @@ public class NoddingHeadWithTempo extends MaxObject {
             bObjectOnOff = false;
             bIsListening = false;
             bIsResponding = false;
-            iNthTimesTempo = 1;
             setAutoBase(0);
             if (tHeadTempoMoving != null) {
                 tHeadTempoMoving.cancel();
@@ -180,6 +179,7 @@ public class NoddingHeadWithTempo extends MaxObject {
     public void setNthTimes(int nthTimes) {
         if (nthTimes > 0 && nthTimes < 8 && nthTimes != iNthTimesTempo) {
             iNthTimesTempo = nthTimes;
+            System.out.println("nth time is set");
         } else {
             System.out.println("Invalid nth times value");
         }
@@ -265,7 +265,7 @@ public class NoddingHeadWithTempo extends MaxObject {
         long lWaitTime;
         public void run() {
             lWaitTime = (long) (fHeadNodInterval * iNthTimesTempo);
-            outlet(iNodeType, fHeadNodInterval); //1->low, 2->mid, 3->high
+            outlet(iNodeType, fHeadNodInterval * iNthTimesTempo); //1->low, 2->mid, 3->high
             iNodCounter++;
             tHeadTempoMoving.schedule(new HeadNod(), lWaitTime);
         }
