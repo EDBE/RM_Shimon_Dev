@@ -20,8 +20,9 @@ public class ProjectStudio extends MaxObject{
 
     boolean bListen2NoteDensity = false;
     boolean bRhythmPatternIsDecided = false;
+    boolean bListen2Drum = false;
 
-    Timer tTimer1;
+    Timer tTimer1 = new Timer();
 
     public ProjectStudio() {
         declareInlets(new int[]{DataTypes.ALL, DataTypes.ALL});
@@ -37,12 +38,13 @@ public class ProjectStudio extends MaxObject{
 
         bListen2NoteDensity = false;
         bRhythmPatternIsDecided = false;
+        bListen2Drum = false;
 
         densityCounterClear();
 
-        if (tTimer1 != null) {
-            tTimer1.cancel();
-        }
+//        if (tTimer1 != null) {
+//            tTimer1.cancel();
+//        }
     }
 
     public void sectionSelector(int sec) {
@@ -52,14 +54,27 @@ public class ProjectStudio extends MaxObject{
         } else if (sec == 38 && iSection != 2) {
             iSection = 2;
             bListen2NoteDensity = false;
-        } else if (sec == 40 && iSection != 3) {
-            iSection = 3;
-            bListen2NoteDensity = true;
+        } else if (sec == 40 && iSection != 31) {
+            iSection = 31;
+            bListen2Drum = true;
         } else if (sec == 37 && iSection != 4) {
             iSection = 4;
             bListen2NoteDensity = false;
+        } else if (sec == 45 && iSection != 32) {
+            iSection = 32;
+            bListen2NoteDensity = true;
+            outlet(1, "start 1024");
         }
         System.out.println("We are in section " + iSection);
+    }
+
+    /*
+    one to one triggering: drummer -> prothetic arm
+     */
+    public void followDrumTrigger() {
+        if (bListen2Drum) {
+            outlet(2, 1);
+        }
     }
 
     public void noteDensity (float density) {
@@ -83,7 +98,6 @@ public class ProjectStudio extends MaxObject{
     }
 
     public void startPlayRhythmPattern() {
-        tTimer1 = new Timer();
         tTimer1.schedule(new startPlayPattern(), 300);
     }
 
