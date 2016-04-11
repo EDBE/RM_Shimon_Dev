@@ -57,7 +57,7 @@ public class NoddingHeadWithTempo extends MaxObject {
         * Output 5:
         */
         declareInlets(new int[]{DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL});
-        declareOutlets(new int[]{DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL});
+        declareOutlets(new int[]{DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL});
         lLastTime = System.currentTimeMillis();
         reset();
         dfDateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
@@ -206,6 +206,8 @@ public class NoddingHeadWithTempo extends MaxObject {
                 if (iNumOfNoteObserve > iNumOfInputNote) {
                     if (tempo > (iInitialBPM - iValidTempoRange) && tempo < (iInitialBPM + iValidTempoRange)) {
                         lfRealtimeTempo.add(tempo);
+                    } else {
+                        lfRealtimeTempo.add((float)iInitialBPM);
                         iNumOfInputNote++;
                     }
                 } else {

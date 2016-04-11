@@ -18,6 +18,7 @@ public class MorningCloud_StructManager extends MaxObject {
     int iEventNum   = 0;
     int iPathPlanSection = 1;
     int iSwitchModeMessageCounter = 0;
+    int iLocalBPM = 95;
 
     long lLastTime;
 
@@ -52,10 +53,10 @@ public class MorningCloud_StructManager extends MaxObject {
         Output 1: Tempo
         Output 2: Velocity
         Output 3: gesture section?
-        Output 4:
+        Output 4:n
          */
         declareInlets(new int[]{DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL});
-        declareOutlets(new int[]{DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL});
+        declareOutlets(new int[]{DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL});
         lLastTime = System.currentTimeMillis();
 
         System.out.println("MorningCloud_StructManager Object is updated!");
@@ -69,6 +70,7 @@ public class MorningCloud_StructManager extends MaxObject {
         iEventNum   = 0;
         iSwitchModeMessageCounter = 0;
         iPathPlanSection = 1;
+        iLocalBPM = 85;
 
         fGlobalBeat = 0.f;
 
@@ -146,12 +148,14 @@ public class MorningCloud_StructManager extends MaxObject {
             headFollowHand();   //communicate with head follows hand patch
             normalHeadNod();    //communicate with nodding head patch
             velocityVariation();//communicate with path planning patch
+            bpmChange();        //set bpm for each individual section of the piece
             // manage play mode switching
             if (sScoreLabel.equals("e68")) {
                 pathPlanOff();
-            } else if (sScoreLabel.equals("dummy")) {//need to figure this one out
-                pathPlanOn();
             }
+//              else if (sScoreLabel.equals("dummy")) {//need to figure this one out
+//                pathPlanOn();
+//            }
         }
     }
 
@@ -239,7 +243,7 @@ public class MorningCloud_StructManager extends MaxObject {
     private void pathPlanOn() {
         if (!bIsPathPlaning) {
             tSwitchModeTask = new Timer();
-            tSwitchModeTask.schedule(new SwitchModeOff2On(), 2000);
+            tSwitchModeTask.schedule(new SwitchModeOff2On(), 1000);
         }
     }
 
@@ -279,11 +283,19 @@ public class MorningCloud_StructManager extends MaxObject {
     }
 
     /*
+    The transition from normal play to path planning play
+    Human performer uses pedal to switch give the trigger
+     */
+    public void pedalOn() {
+        pathPlanOn();
+    }
+
+    /*
     Robot head follows human's hand movement
     Swiching this function on at particular time
      */
     private void headFollowHand() {
-        if (sScoreLabel.equals("s")) {
+        if (sScoreLabel.equals("s") || sScoreLabel.equals("measure1")) {
             HeadFollowHandSwitcher(true);
         } else if (sScoreLabel.equals("e3")) {
             HeadFollowHandSwitcher(false);
@@ -332,6 +344,8 @@ public class MorningCloud_StructManager extends MaxObject {
                     normalHeadNodSwitcher(true);
                 } else if (sScoreLabel.equals("e66")) {
                     normalHeadNodSwitcher(false);
+                } else if (sScoreLabel.equals("e68")) {
+                    normalHeadNodSwitcher(true);
                 }
             } else if (iPathPlanSection == 2) {
                 if (sScoreLabel.equals("ee2")) {
@@ -390,6 +404,27 @@ public class MorningCloud_StructManager extends MaxObject {
         }
     }
     /*
+    Change the bpm at particular location of the score
+     */
+    private void bpmChange() {
+        if (sScoreLabel.equals("measure1")) {
+            setBPM(95);
+        } else if (sScoreLabel.equals("e21")) {
+            setBPM(68);
+        } else if (sScoreLabel.equals("measure32")) {
+            setBPM(90);
+        } else if (sScoreLabel.equals("e54")) {
+            setBPM(90);
+        } else if (sScoreLabel.equals("e68")) {
+            setBPM(70);
+        } else if (sScoreLabel.equals("ee1")) {
+            setBPM(85);
+        } else if (sScoreLabel.equals("ee20")) {
+            setBPM(90);
+        }
+    }
+
+    /*
     Switcher of the function of normal head nodding
      */
     private void normalHeadNodSwitcher(boolean b) {
@@ -445,6 +480,15 @@ public class MorningCloud_StructManager extends MaxObject {
         outlet(1, "high");
         sCurrentRobotVelocity = "High";
     }
+    /*
+    For each mini section of the composition, set a default BPM
+    */
+    private void setBPM(int bpm) {
+        if (bpm > 50 && bpm < 500 && bpm != iLocalBPM) {
+            iLocalBPM = bpm;
+        }
+        outlet(12, iLocalBPM);
+    }
 
     class SwitchModeOn2Off extends TimerTask {
         long waitTime = 500;
@@ -463,6 +507,7 @@ public class MorningCloud_StructManager extends MaxObject {
                 System.out.println("Path Planing OFF");
 //                outlet(10, "start");      //using 'detonate' to play back midi
                 outlet(10, "start 1024");   //using 'seq' object to play back midi
+                System.out.println("Shimon starts to solo");
                 iSwitchModeMessageCounter = 0;
             } else {
                 tSwitchModeTask.schedule(new SwitchModeOn2Off(), waitTime);
@@ -478,12 +523,15 @@ public class MorningCloud_StructManager extends MaxObject {
                     outlet(2, "/pathPlanningON 1");
                 } else {
                     bIsPathPlaning = true;
-                    outlet(4, 1);
+                    outlet(4, 1);   //select the second instruction
+                    outlet(11, "/scoreNum 1");    //load the second path planning score
                 }
             }
             if (iSwitchModeMessageCounter >= 5) {
                 tSwitchModeTask.cancel();
                 System.out.println("Path Planing On");
+                outlet(11, "/startstop start");
+                System.out.println("Human-robot unison!");
                 iSwitchModeMessageCounter = 0;
             } else {
                 tSwitchModeTask.schedule(new SwitchModeOff2On(), waitTime);
