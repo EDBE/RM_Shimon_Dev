@@ -18,7 +18,7 @@ import java.util.*;
 public class NoddingHeadWithTempo extends MaxObject {
     int iRealTimeTempo = 0;
     int iInitialBPM = 95;
-    int iValidTempoRange = 20;
+    int iValidTempoRange = 30;
     int iNumOfNoteObserve = 3;
     int iNodCounter = 0;
     int iNodeType = 2;
@@ -208,8 +208,8 @@ public class NoddingHeadWithTempo extends MaxObject {
                         lfRealtimeTempo.add(tempo);
                     } else {
                         lfRealtimeTempo.add((float)iInitialBPM);
-                        iNumOfInputNote++;
                     }
+                    iNumOfInputNote++;
                 } else {
                     fHeadNodInterval = intervalCalculation(smoothedTempo(lfRealtimeTempo, iNumOfNoteObserve));
                     System.out.println("The interval of nodding is " + fHeadNodInterval);
@@ -224,6 +224,7 @@ public class NoddingHeadWithTempo extends MaxObject {
                     startHeadNod((long)(fHeadNodInterval/2));
                     bIsResponding = true;
                 }
+//                startHeadNod((long)(fHeadNodInterval/2));
             }
         }
     }

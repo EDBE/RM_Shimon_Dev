@@ -290,19 +290,30 @@ public class MorningCloud_StructManager extends MaxObject {
         pathPlanOn();
     }
 
+
     /*
     Robot head follows human's hand movement
     Swiching this function on at particular time
      */
     private void headFollowHand() {
-        if (sScoreLabel.equals("s") || sScoreLabel.equals("measure1")) {
-            HeadFollowHandSwitcher(true);
-        } else if (sScoreLabel.equals("e3")) {
-            HeadFollowHandSwitcher(false);
-        } else if (sScoreLabel.equals("measure31")) {
-            HeadFollowHandSwitcher(true);
-        } else if (sScoreLabel.equals("e34")) {
-            HeadFollowHandSwitcher(false);
+        if (iPathPlanSection == 1) {
+            if (sScoreLabel.equals("s") || sScoreLabel.equals("measure1")) {
+                HeadFollowHandSwitcher(true);
+            } else if (sScoreLabel.equals("e3")) {
+                HeadFollowHandSwitcher(false);
+            } else if (sScoreLabel.equals("measure31")) {
+                HeadFollowHandSwitcher(true);
+            } else if (sScoreLabel.equals("e34")) {
+                HeadFollowHandSwitcher(false);
+            }
+        } else {
+            if (sScoreLabel.equals("ee20")) {
+                HeadFollowHandSwitcher(true);
+            } else if (sScoreLabel.equals("ee21")) {
+                HeadFollowHandSwitcher(false);
+            } else if (sScoreLabel.equals("ee46")) {
+                HeadFollowHandSwitcher(true);
+            }
         }
     }
     /*
@@ -358,7 +369,7 @@ public class MorningCloud_StructManager extends MaxObject {
                     normalHeadNodSwitcher(false);
                 } else if (sScoreLabel.equals("ee43")) {
                     normalHeadNodSwitcher(true);
-                } else if (sScoreLabel.equals("ee46")) {
+                } else if (sScoreLabel.equals("ee45")) {
                     normalHeadNodSwitcher(false);
                 }
             }
