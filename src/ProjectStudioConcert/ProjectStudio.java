@@ -1,5 +1,6 @@
 package ProjectStudioConcert;
 
+import com.cycling74.max.Atom;
 import com.cycling74.max.DataTypes;
 import com.cycling74.max.MaxObject;
 
@@ -24,7 +25,7 @@ public class ProjectStudio extends MaxObject{
     int iSection4NodCount = 0;
     int iBehaviorNodCount = 0;
 
-    float fHeadNodInterval = 1000.f;
+    float fHeadNodInterval = 882.f;
 
     boolean bListen2NoteDensity = false;
     boolean bRhythmPatternIsDecided = false;
@@ -37,13 +38,14 @@ public class ProjectStudio extends MaxObject{
     Timer tTimer2;    //for Shimon arm
     Timer tHeadControl;  // for Shimon Head Nodding
     Timer tBasePanControl;   //for Shimon base pan control
+    Timer tMetronome;
 
     public ProjectStudio() {
         declareInlets(new int[]{DataTypes.ALL, DataTypes.ALL});
         declareOutlets(new int[]{DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL,
                                  DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL,
                                  DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL,
-                                 DataTypes.ALL});
+                                 DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL});
         reset();
         System.out.println("Project Studio Object is updated!!!");
     }
@@ -66,6 +68,7 @@ public class ProjectStudio extends MaxObject{
 
         densityCounterClear();
         headNodCounterClear();
+        setMetronome(1);
 
 //        if (tTimer1 != null) {
 //            tTimer1.cancel();
@@ -77,12 +80,14 @@ public class ProjectStudio extends MaxObject{
             iSection = 1;
             stopALL();
             timerCancel();
-            outlet(0,4);    //select midi file of section 1 for arm
+            outlet(0, 4);    //select midi file of section 1 for arm
             bListen2NoteDensity = false;
             headNodCounterClear();
             tHeadControl = new Timer();
-            tHeadControl.schedule(new headmoveSection1(), 500); //start head move
-            startPlayRhythmPattern();   //start prothetic arm
+            tHeadControl.schedule(new headmoveSection1(), (int)fHeadNodInterval*16); //start head move
+            setMetronome(iSection);
+            outlet(15, 1);  //start metronome
+//            startPlayRhythmPattern();   //start prothetic arm
             System.out.println("We are in section " + iSection + " and play");
         } else if (sec == 38 && iSection != 2) {
             iSection = 2;
@@ -96,6 +101,8 @@ public class ProjectStudio extends MaxObject{
             outlet(9, 0);   //stop auto base pan
             outlet(11, 0);  //stop the arm follow human
             outlet(12, 0);  //turn off the mic
+            outlet(15, 0);  //stop metronome
+            setMetronome(iSection); //set new metronome
             System.out.println("We are in section " + iSection);
         } else if (sec == 40 && iSection != 31) {
             iSection = 31;
@@ -109,6 +116,8 @@ public class ProjectStudio extends MaxObject{
             outlet(9, 0);   //stop auto base pan
             outlet(11,1);   //let the arm follow human
             outlet(12,1);   // turn on the mic
+            outlet(15, 0);  //stop metronome
+            setMetronome(iSection); //set new metronome
             System.out.println("We are in section " + iSection);
         } else if (sec == 37 && iSection != 4) {
             iSection = 4;
@@ -124,6 +133,8 @@ public class ProjectStudio extends MaxObject{
             outlet(11, 0);  //stop the arm follow human directly
             outlet(12, 0);  //turn off the mic
             outlet(3, 0);   //switch arm to the non-loop mode
+            outlet(15, 0);  //stop metronome
+            setMetronome(iSection); //set new metronome
             System.out.println("We are in section " + iSection);
         } else if (sec == 45 && iSection != 32) {
             iSection = 32;
@@ -133,9 +144,11 @@ public class ProjectStudio extends MaxObject{
             }
             headNodCounterClear();
 //            tHeadControl.cancel();    //cancel the current execution
+            outlet(0, 0);
             outlet(1, "start 1024");  //start to play the arm rhythm pattern
             outlet(3, 1);   //switch arm to the loop mode
             outlet(11, 0);  //stop the arm follow human directly
+            setMetronome(iSection); //set new metronome
             System.out.println("We are in section " + iSection);
         }
     }
@@ -178,7 +191,7 @@ public class ProjectStudio extends MaxObject{
         // play back midi file
         if (i == 50 && !bShimonIsPlay) {
             tTimer2 = new Timer();
-            tTimer2.schedule(new ShimonStartPlay(), 500);
+            tTimer2.schedule(new ShimonStartPlay(), 0);
             bShimonIsPlay = true;
 
             // head movement
@@ -193,7 +206,7 @@ public class ProjectStudio extends MaxObject{
                 tHeadControl.schedule(new headMoveSection3(), 500);
                 tBasePanControl.schedule(new startAutoBasePan(), 500 + (int) (16 * fHeadNodInterval));
             } else if (iSection == 32) {
-//            tHeadControl = new Timer();
+//            tHeadControl = new Timer();4
 //            tHeadControl.schedule(new headMoveSection3(), 500);
             } else if (iSection == 4) {
                 tHeadControl = new Timer();
@@ -201,6 +214,8 @@ public class ProjectStudio extends MaxObject{
                 tHeadControl.schedule(new headMoveSection4(), 500);
                 tBasePanControl.schedule(new startAutoBasePan(), 500 + (int) (16 * fHeadNodInterval));
             }
+            tMetronome = new Timer();
+            tMetronome.schedule(new startNewMetronome(), 500);
         }
     }
 
@@ -247,6 +262,7 @@ public class ProjectStudio extends MaxObject{
         stopHeadMove();
         stopArmPlay();
         stopShimonPlay();
+        outlet(15, 0);
     }
 
     public void stopHeadMove() {
@@ -292,6 +308,9 @@ public class ProjectStudio extends MaxObject{
         if ( tBasePanControl != null) {
             tBasePanControl.cancel();
         }
+        if (tMetronome != null) {
+            tMetronome.cancel();
+        }
     }
 
     private int whichPattern() {
@@ -329,6 +348,28 @@ public class ProjectStudio extends MaxObject{
         iSection3NodCount = 0;
         iSection4NodCount = 0;
         iBehaviorNodCount = 0;
+    }
+
+    private void headDefaultPos() {
+        outlet(10, 0.f);
+        outlet(13, 0.f);
+    }
+
+    private void setMetronome(int secNum) {
+        int bpm = 0;
+        int beatNum = 0;
+        if (secNum == 1) {
+            bpm = 136; beatNum = 4;
+        } else if (secNum == 2) {
+            bpm = 120; beatNum = 4;
+        } else if (secNum == 31) {
+            bpm = 182; beatNum = 6;
+        } else if (secNum == 32) {
+
+        } else if (secNum == 4) {
+            bpm = 120; beatNum = 4;
+        }
+        outlet(14, new Atom[]{ Atom.newAtom(bpm), Atom.newAtom(beatNum)});
     }
 
     class startPlayPattern extends TimerTask {
@@ -426,7 +467,7 @@ public class ProjectStudio extends MaxObject{
     class headNodBehavior extends TimerTask {
         public void run() {
             if (rRandomGen.nextFloat()>.7f) {
-                float lookAtPosition = rRandomGen.nextFloat()*2 - 1.1f;
+                float lookAtPosition = rRandomGen.nextFloat()*1.4f - .7f;
                 outlet(10, lookAtPosition);
             }
             if (iBehaviorNodCount < 10) {
@@ -453,5 +494,9 @@ public class ProjectStudio extends MaxObject{
             outlet(9, 1);   //start the auto base pan
         }
     }
-
+    class startNewMetronome extends TimerTask {
+        public void run() {
+            outlet(15, 1);
+        }
+    }
 }
