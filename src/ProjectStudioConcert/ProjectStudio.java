@@ -81,8 +81,10 @@ public class ProjectStudio extends MaxObject{
             stopALL();
             timerCancel();
             outlet(0, 4);    //select midi file of section 1 for arm
+            outlet(10, 0.f); //neck pan go to zero
             bListen2NoteDensity = false;
             headNodCounterClear();
+            fHeadNodInterval = 800.f;
             tHeadControl = new Timer();
             tHeadControl.schedule(new headmoveSection1(), (int)fHeadNodInterval*16); //start head move
             setMetronome(iSection);
@@ -99,9 +101,11 @@ public class ProjectStudio extends MaxObject{
             timerCancel();  //cancel all of the timer
             outlet(4, 0);   //prepare the midi file for shimon
             outlet(9, 0);   //stop auto base pan
+            outlet(10,0.f); //neck pan go to zero
             outlet(11, 0);  //stop the arm follow human
             outlet(12, 0);  //turn off the mic
             outlet(15, 0);  //stop metronome
+            fHeadNodInterval = 1000.f;
             setMetronome(iSection); //set new metronome
             System.out.println("We are in section " + iSection);
         } else if (sec == 40 && iSection != 31) {
@@ -114,9 +118,11 @@ public class ProjectStudio extends MaxObject{
             headNodCounterClear();
             outlet(4, 1);   //prepare teh midi file for shimon
             outlet(9, 0);   //stop auto base pan
+            outlet(10,0.f); //neck pan go to zero
             outlet(11,1);   //let the arm follow human
             outlet(12,1);   // turn on the mic
             outlet(15, 0);  //stop metronome
+            fHeadNodInterval = 660.f;
             setMetronome(iSection); //set new metronome
             System.out.println("We are in section " + iSection);
         } else if (sec == 37 && iSection != 4) {
@@ -130,6 +136,7 @@ public class ProjectStudio extends MaxObject{
             outlet(0, 5);   //prepare midi file for arm
             outlet(4, 2);   //prepare midi for shimon
             outlet(9, 0);   //stop auto base pan
+            outlet(10,0.f); //neck pan go to zero
             outlet(11, 0);  //stop the arm follow human directly
             outlet(12, 0);  //turn off the mic
             outlet(3, 0);   //switch arm to the non-loop mode
@@ -147,7 +154,9 @@ public class ProjectStudio extends MaxObject{
             outlet(0, 0);
             outlet(1, "start 1024");  //start to play the arm rhythm pattern
             outlet(3, 1);   //switch arm to the loop mode
+            outlet(10,0.f); //neck pan go to zero
             outlet(11, 0);  //stop the arm follow human directly
+            fHeadNodInterval = 1000.f;
             setMetronome(iSection); //set new metronome
             System.out.println("We are in section " + iSection);
         }
@@ -214,8 +223,10 @@ public class ProjectStudio extends MaxObject{
                 tHeadControl.schedule(new headMoveSection4(), 500);
                 tBasePanControl.schedule(new startAutoBasePan(), 500 + (int) (16 * fHeadNodInterval));
             }
-            tMetronome = new Timer();
-            tMetronome.schedule(new startNewMetronome(), 500);
+            if (iSection != 2) {
+                tMetronome = new Timer();
+                tMetronome.schedule(new startNewMetronome(), 500);
+            }
         }
     }
 
@@ -359,7 +370,7 @@ public class ProjectStudio extends MaxObject{
         int bpm = 0;
         int beatNum = 0;
         if (secNum == 1) {
-            bpm = 136; beatNum = 4;
+            bpm = 152; beatNum = 4;
         } else if (secNum == 2) {
             bpm = 120; beatNum = 4;
         } else if (secNum == 31) {
@@ -389,9 +400,9 @@ public class ProjectStudio extends MaxObject{
         public void run() {
             if (iSection1NodCount <= 16) {
                 if (iSection1NodCount < 8) {
-                    outlet(10, 1.1f);
+                    outlet(10, .8f);
                 } else {
-                    outlet(10, -1.1f);
+                    outlet(10, -.8f);
                 }
                 waitTime = (int)fHeadNodInterval;
                 outlet(6, fHeadNodInterval);    //HIP HOP NOD low
@@ -430,12 +441,13 @@ public class ProjectStudio extends MaxObject{
         public void run() {
             if (iSection3NodCount <= 16) {
                 if (iSection3NodCount < 8) {
-                    outlet(10, -1.1f);
+                    outlet(10, -.7f);
                 } else {
-                    outlet(10, 1.1f);
+                    outlet(10, .7f);
                 }
             }
             waitTime = (int)fHeadNodInterval;
+            outlet(10, 0.1f);
             outlet(iShimonHeadMoveHeight, fHeadNodInterval);
             iSection3NodCount++;
             tHeadControl.schedule(new headMoveSection3(), waitTime);
@@ -446,9 +458,9 @@ public class ProjectStudio extends MaxObject{
         public void run() {
             if (iSection4NodCount <= 8) {
                 if (iSection4NodCount < 4) {
-                    outlet(10, 1.1f);
+                    outlet(10, .7f);
                 } else {
-                    outlet(10, -1.1f);
+                    outlet(10, -.7f);
                 }
                 waitTime = (int)fHeadNodInterval;
                 outlet(iShimonHeadMoveHeight, fHeadNodInterval);
@@ -467,7 +479,7 @@ public class ProjectStudio extends MaxObject{
     class headNodBehavior extends TimerTask {
         public void run() {
             if (rRandomGen.nextFloat()>.7f) {
-                float lookAtPosition = rRandomGen.nextFloat()*1.4f - .7f;
+                float lookAtPosition = rRandomGen.nextFloat()*1.3f - .65f;
                 outlet(10, lookAtPosition);
             }
             if (iBehaviorNodCount < 10) {

@@ -50,10 +50,19 @@ public class MorningCloud_StructManager extends MaxObject {
         Input 4: receive score label
         Input 5: receive global beat number
         =========================
-        Output 1: Tempo
-        Output 2: Velocity
-        Output 3: gesture section?
-        Output 4:n
+        Output 0: Tempo
+        Output 1: Velocity
+        Output 2: Shimon playing mode switch
+        Output 3: Communicate with normal play patch
+        Output 4: Communicate with path plan playing
+        Output 5: Communicate with Kinect
+        Output 6: Communicate with HeadFollowHand patch
+        Output 7: Turn Normal Head Gesture object ON
+        Output 8: Communicate with Normal Head Gesture (velocity)
+        Output 9: Communicate with Normal Head Gesture (base pan)
+        Output 10:Communicate with Normal Play to start play back MIDI
+        Output 11:Communicate with Score Follower to start listen to second part
+        Output 12:Communicate with the nodding head patch to get default BPM
          */
         declareInlets(new int[]{DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL});
         declareOutlets(new int[]{DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL});
@@ -434,7 +443,6 @@ public class MorningCloud_StructManager extends MaxObject {
             setBPM(90);
         }
     }
-
     /*
     Switcher of the function of normal head nodding
      */

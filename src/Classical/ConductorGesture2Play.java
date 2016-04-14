@@ -4,7 +4,7 @@ import com.cycling74.max.DataTypes;
 import com.cycling74.max.MaxObject;
 
 /**
- * Created by musictechnology on 4/1/16.
+ * Created by Liang Tang on 4/1/16.
  */
 public class ConductorGesture2Play extends MaxObject {
 
@@ -22,8 +22,16 @@ public class ConductorGesture2Play extends MaxObject {
     boolean bIsLeftHandIn = false;
     boolean bIsRightHandIn = false;
     boolean bRobotIsWatching = false;
+    boolean bObjectIsOn = false;
 
     long lLastTime = System.currentTimeMillis();
+
+    private enum eArmDirection {
+        Left, Right, Up, Down
+    }
+
+    eArmDirection ehLHDirection, ehRHDirection;
+    
     /*
     Constructor: declare the input and output of the object
     2 inputs, 4 outputs
@@ -33,7 +41,7 @@ public class ConductorGesture2Play extends MaxObject {
         2 Input:
         4 Output:
          */
-        declareInlets(new int[]{DataTypes.ALL, DataTypes.ALL, DataTypes.ALL});
+        declareInlets(new int[]{DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL});
         declareOutlets(new int[]{DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL});
         lLastTime = System.currentTimeMillis();
         System.out.println("ConductorGesture2Play Object is updated!");
@@ -46,6 +54,18 @@ public class ConductorGesture2Play extends MaxObject {
         bRobotIsWatching = false;
     }
 
+    /*
+    Switch the object on and off
+    The input: toggle
+     */
+    public void objectSwitcher(int switcher) {
+        if (switcher == 1) {
+            bObjectIsOn = true;
+        } else {
+            bObjectIsOn = false;
+        }
+        System.out.println("This object is " + bObjectIsOn);
+    }
     /*
     Input: the lower and upper bound of the torso
     To set the active area
@@ -106,11 +126,11 @@ public class ConductorGesture2Play extends MaxObject {
     public void inlet(float f) {
         int inletIdx;
         inletIdx = getInlet();
-        if (inletIdx == 1) {
+        if (inletIdx == 3) {
             fTorsoZAxis = f;
-        } else if (inletIdx == 2) {
+        } else if (inletIdx == 1) {
             fLeftHandYAxis = f;
-        } else if (inletIdx == 3) {
+        } else if (inletIdx == 2) {
             fRightHandXAxis = f;
         }
         System.out.println("I am receiving data from  " + inletIdx + "th inlet");
