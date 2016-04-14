@@ -246,13 +246,13 @@ public class MorningCloud_StructManager extends MaxObject {
     private void pathPlanOff() {
         if (bIsPathPlaning) {
             tSwitchModeTask = new Timer();
-            tSwitchModeTask.schedule(new SwitchModeOn2Off(), 2500);
+            tSwitchModeTask.schedule(new SwitchModeOn2Off(), 1500);
         }
     }
     private void pathPlanOn() {
         if (!bIsPathPlaning) {
             tSwitchModeTask = new Timer();
-            tSwitchModeTask.schedule(new SwitchModeOff2On(), 1000);
+            tSwitchModeTask.schedule(new SwitchModeOff2On(), 500);
         }
     }
 
@@ -538,21 +538,24 @@ public class MorningCloud_StructManager extends MaxObject {
         long waitTime = 500;
         public void run() {
             if(!bIsPathPlaning) {
-                if (iSwitchModeMessageCounter < 5) {
+                if (iSwitchModeMessageCounter < 3) {
                     outlet(2, "/pathPlanningON 1");
-                } else {
-                    bIsPathPlaning = true;
                     outlet(4, 1);   //select the second instruction
                     outlet(11, "/scoreNum 1");    //load the second path planning score
+                } else {
+                    bIsPathPlaning = true;
+//                    outlet(4, 1);   //select the second instruction
+//                    outlet(11, "/scoreNum 1");    //load the second path planning score
                 }
             }
-            if (iSwitchModeMessageCounter >= 5) {
+            if (iSwitchModeMessageCounter >= 4) {
                 tSwitchModeTask.cancel();
                 System.out.println("Path Planing On");
                 outlet(11, "/startstop start");
                 System.out.println("Human-robot unison!");
                 iSwitchModeMessageCounter = 0;
             } else {
+//                outlet(11, "/startstop start");
                 tSwitchModeTask.schedule(new SwitchModeOff2On(), waitTime);
                 iSwitchModeMessageCounter++;
             }
