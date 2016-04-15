@@ -35,6 +35,7 @@ public class MorningCloud_StructManager extends MaxObject {
     boolean bHeadIsNormalNod = false;
     boolean bIsAutoBasePan = false;
     boolean bHeadIsSpecialMove = false;
+    boolean bHeadIsFollowHead = false;
 
     Timer tSwitchModeTask;
 
@@ -63,9 +64,12 @@ public class MorningCloud_StructManager extends MaxObject {
         Output 10:Communicate with Normal Play to start play back MIDI
         Output 11:Communicate with Score Follower to start listen to second part
         Output 12:Communicate with the nodding head patch to get default BPM
+        Output 13:Blinking message
+        Output 14:neck pan control
+        Output 15:communicate with HeadFollowHead patch (switch On and Off)
          */
         declareInlets(new int[]{DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL});
-        declareOutlets(new int[]{DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL});
+        declareOutlets(new int[]{DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL});
         lLastTime = System.currentTimeMillis();
 
         System.out.println("MorningCloud_StructManager Object is updated!");
@@ -92,6 +96,7 @@ public class MorningCloud_StructManager extends MaxObject {
         bHeadIsFollowHand = false;
         bHeadIsNormalNod = false;
         bIsAutoBasePan = false;
+        bHeadIsFollowHead = false;
 
         outlet(2, "/pathPlanningON 1");
     }
@@ -158,6 +163,9 @@ public class MorningCloud_StructManager extends MaxObject {
             normalHeadNod();    //communicate with nodding head patch
             velocityVariation();//communicate with path planning patch
             bpmChange();        //set bpm for each individual section of the piece
+            blink();            //robot blinks
+            neckMove();         //control neck pan seperately
+            headFollowHead();   //control head follow head
             // manage play mode switching
             if (sScoreLabel.equals("e68")) {
                 pathPlanOff();
@@ -468,7 +476,18 @@ public class MorningCloud_StructManager extends MaxObject {
             bIsAutoBasePan = false;
         }
     }
-
+    /*
+    switch the function of head following head On or Off at particular points
+    */
+    private void headFollowHead() {
+        if (iPathPlanSection == 1) {
+            if (sScoreLabel.equals("e40")) {
+                head2HeadSwitcher(true);
+            } else if (sScoreLabel.equals("e44")) {
+                head2HeadSwitcher(false);
+            }
+        }
+    }
     /*
     Robot's head creats some special gestures like varied speed of head up and down,
     exaggerated blinking
@@ -508,6 +527,74 @@ public class MorningCloud_StructManager extends MaxObject {
         }
         outlet(12, iLocalBPM);
     }
+    /*
+    make robot blink at particular point
+     */
+    private void blink() {
+        if (sScoreLabel.equals("s") || sScoreLabel.equals("measure1")) {
+            blinkBig();
+        } else if (sScoreLabel.equals("e15")) {
+            blinkOnce();
+        } else if (sScoreLabel.equals("e101")) {
+            blinkOnce();
+        } else if (sScoreLabel.equals("e102")) {
+            blinkBig();
+        } else if (sScoreLabel.equals("e104")) {
+            blinkOnce();
+        }
+    }
+    /*
+    blinking: robot blink
+     */
+    private void blinkOnce() {
+        outlet(13, "/blink");
+    }
+    /*
+    blinking: robot blink with higher amplitude
+     */
+    private void blinkBig() {
+        outlet(13, "/BigBlink");
+    }
+    /*
+    neck pan control: slowly or quickly look to the left or right
+     */
+    private void neckPanCtl(String direction, float amplitude, float speed) {
+        if (direction.equals("right")) {
+            outlet(14, new Atom[]{Atom.newAtom(amplitude), Atom.newAtom(speed)});
+        } else {
+            outlet(14, new Atom[]{Atom.newAtom(-amplitude), Atom.newAtom(speed)});
+        }
+    }
+    /*
+    make robot look at the human performer using neck pan
+     */
+    private void lookAtMe() {
+        neckPanCtl("right", .2f, 3.f);
+    }
+    /*
+    using neck pan at particular points in the piece
+     */
+    private void neckMove() {
+        if (sScoreLabel.equals("measure1") || sScoreLabel.equals("s")) {
+            lookAtMe();
+        } else if (sScoreLabel.equals("measure19")) {
+            neckPanCtl("right", 0.1f, 6.f);
+        }
+    }
+    /*
+    make robot's head follow the human's head
+    essentially, the necktilt follows the y axis of head position
+     */
+    private void head2HeadSwitcher(boolean switcher) {
+        if (!bHeadIsFollowHead && switcher == true) {
+            outlet(15, 1);
+            bHeadIsFollowHead = true;
+        } else if (bHeadIsFollowHead && switcher == false) {
+            outlet(15, 0);
+            bHeadIsFollowHead = false;
+        }
+    }
+
 
     class SwitchModeOn2Off extends TimerTask {
         long waitTime = 500;
@@ -535,7 +622,7 @@ public class MorningCloud_StructManager extends MaxObject {
         }
     }
     class SwitchModeOff2On extends TimerTask {
-        long waitTime = 500;
+        long waitTime = 750;
         public void run() {
             if(!bIsPathPlaning) {
                 if (iSwitchModeMessageCounter < 3) {

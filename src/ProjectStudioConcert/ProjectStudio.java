@@ -175,13 +175,14 @@ public class ProjectStudio extends MaxObject{
         if (bListen2NoteDensity) {
             if (density > 60.f && density < 250.f) {
                 iDensityCounter1++;
-            } else if (density > 280.f && density < 500.f) {
+            } else if (density > 300.f && density < 500.f) {
                 iDensityCounter2++;
-            } else if (density > 550.f && density < 750.f) {
-                iDensityCounter3++;
-            } else if (density > 780.f && density < 1050.f) {
-                iDensityCounter4++;
             }
+//            } else if (density > 550.f && density < 750.f) {
+//                iDensityCounter3++;
+//            } else if (density > 780.f && density < 1050.f) {
+//                iDensityCounter4++;
+//            }
         }
     }
 
@@ -201,6 +202,9 @@ public class ProjectStudio extends MaxObject{
         if (i == 50 && !bShimonIsPlay) {
             tTimer2 = new Timer();
             tTimer2.schedule(new ShimonStartPlay(), 0);
+            if (iSection == 4) {
+                startPlayRhythmPattern();
+            }
             bShimonIsPlay = true;
 
             // head movement
@@ -326,7 +330,7 @@ public class ProjectStudio extends MaxObject{
 
     private int whichPattern() {
         int patternIdx = -1;
-        if (maxValue(iDensityCounter1, iDensityCounter2, iDensityCounter3, iDensityCounter4)>=3) {
+        if (maxValue(iDensityCounter1, iDensityCounter2, iDensityCounter3, iDensityCounter4)>=2) {
             patternIdx = iPatternIdx;
             System.out.println("pattern index is " + iPatternIdx);
         }
@@ -378,7 +382,7 @@ public class ProjectStudio extends MaxObject{
         } else if (secNum == 32) {
 
         } else if (secNum == 4) {
-            bpm = 120; beatNum = 4;
+            bpm = 130; beatNum = 6;
         }
         outlet(14, new Atom[]{ Atom.newAtom(bpm), Atom.newAtom(beatNum)});
     }
