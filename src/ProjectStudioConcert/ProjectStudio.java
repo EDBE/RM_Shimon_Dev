@@ -86,7 +86,7 @@ public class ProjectStudio extends MaxObject{
             headNodCounterClear();
             fHeadNodInterval = 800.f;
             tHeadControl = new Timer();
-            tHeadControl.schedule(new headmoveSection1(), (int)fHeadNodInterval*16); //start head move
+            tHeadControl.schedule(new headmoveSection1(), (int)fHeadNodInterval*8); //start head move
             setMetronome(iSection);
             outlet(15, 1);  //start metronome
 //            startPlayRhythmPattern();   //start prothetic arm
@@ -173,9 +173,9 @@ public class ProjectStudio extends MaxObject{
 
     public void noteDensity (float density) {
         if (bListen2NoteDensity) {
-            if (density > 60.f && density < 250.f) {
+            if (density > 60.f && density < 100.f) {
                 iDensityCounter1++;
-            } else if (density > 300.f && density < 500.f) {
+            } else if (density > 150.f && density < 500.f) {
                 iDensityCounter2++;
             }
 //            } else if (density > 550.f && density < 750.f) {
@@ -414,7 +414,8 @@ public class ProjectStudio extends MaxObject{
                 tHeadControl.schedule(new headmoveSection1(), waitTime);
             } else {
                 waitTime = (int)(fHeadNodInterval * 2);
-                outlet(10, 0.f);
+                float neck = rRandomGen.nextFloat()*1.1f - 0.55f;
+                outlet(10, neck);
                 outlet(7, fHeadNodInterval*2);
                 tHeadControl.schedule(new headmoveSection1(), waitTime);
             }
