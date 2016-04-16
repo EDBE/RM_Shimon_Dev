@@ -36,6 +36,7 @@ public class MorningCloud_StructManager extends MaxObject {
     boolean bIsAutoBasePan = false;
     boolean bHeadIsSpecialMove = false;
     boolean bHeadIsFollowHead = false;
+    boolean bHumanIsSolo = false;
 
     Timer tSwitchModeTask;
 
@@ -69,7 +70,7 @@ public class MorningCloud_StructManager extends MaxObject {
         Output 15:communicate with HeadFollowHead patch (switch On and Off)
          */
         declareInlets(new int[]{DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL});
-        declareOutlets(new int[]{DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL});
+        declareOutlets(new int[]{DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL});
         lLastTime = System.currentTimeMillis();
 
         System.out.println("MorningCloud_StructManager Object is updated!");
@@ -97,6 +98,7 @@ public class MorningCloud_StructManager extends MaxObject {
         bHeadIsNormalNod = false;
         bIsAutoBasePan = false;
         bHeadIsFollowHead = false;
+        bHumanIsSolo = false;
 
         outlet(2, "/pathPlanningON 1");
     }
@@ -307,6 +309,19 @@ public class MorningCloud_StructManager extends MaxObject {
         pathPlanOn();
     }
 
+    /*
+    when receive the ending signal from Shimon solo part, starts the human solo part
+    when receive the ending signal from Human solo part, ends this function
+     */
+    public void setbHumanIsSolo(int switcher) {
+        if (!bHumanIsSolo && switcher == 1) {
+            bHumanIsSolo = true;
+            outlet(16, 1);
+        } else if (bHumanIsSolo && switcher == 0) {
+            bHumanIsSolo = false;
+            outlet(16, 0);
+        }
+    }
 
     /*
     Robot head follows human's hand movement
