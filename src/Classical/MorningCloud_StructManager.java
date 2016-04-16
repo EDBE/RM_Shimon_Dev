@@ -256,7 +256,7 @@ public class MorningCloud_StructManager extends MaxObject {
     private void pathPlanOff() {
         if (bIsPathPlaning) {
             tSwitchModeTask = new Timer();
-            tSwitchModeTask.schedule(new SwitchModeOn2Off(), 1500);
+            tSwitchModeTask.schedule(new SwitchModeOn2Off(), 2500);
         }
     }
     private void pathPlanOn() {
@@ -549,7 +549,7 @@ public class MorningCloud_StructManager extends MaxObject {
         if (sScoreLabel.equals("s") || sScoreLabel.equals("measure1")) {
             blinkBig();
         } else if (sScoreLabel.equals("e15")) {
-            blinkOnce();
+            blinkBig();
         } else if (sScoreLabel.equals("e101")) {
             blinkOnce();
         } else if (sScoreLabel.equals("e102")) {
@@ -568,7 +568,7 @@ public class MorningCloud_StructManager extends MaxObject {
     blinking: robot blink with higher amplitude
      */
     private void blinkBig() {
-        outlet(13, "/BigBlink");
+        outlet(13, "/FastBlink1");
     }
     /*
     neck pan control: slowly or quickly look to the left or right
