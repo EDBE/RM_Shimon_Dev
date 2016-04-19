@@ -19,7 +19,7 @@ public class NoddingHeadWithTempo extends MaxObject {
     int iRealTimeTempo = 0;
     int iInitialBPM = 95;
     int iValidTempoRange = 30;
-    int iNumOfNoteObserve = 3;
+    int iNumOfNoteObserve = 2;
     int iNodCounter = 0;
     int iNodeType = 2;
     int iNumOfInputNote = 0;
@@ -36,6 +36,8 @@ public class NoddingHeadWithTempo extends MaxObject {
     boolean bAutoBasePan = false;
 
     volatile List<Float> lfRealtimeTempo = new ArrayList<Float>();
+
+    Random rRandomGen = new Random();
 
     Timer tHeadTempoMoving = new Timer();
 
@@ -116,6 +118,8 @@ public class NoddingHeadWithTempo extends MaxObject {
             if(!(lfRealtimeTempo.isEmpty())) {
                 lfRealtimeTempo.clear();
             }
+            iNodCounter = 0;    //counter reset
+            outlet(5, .0f);     // neck pan to 0 position
             System.out.println("HeadNodding object is OFF!!!");
         }
         outlet(0, bObjectOnOff);
@@ -157,7 +161,7 @@ public class NoddingHeadWithTempo extends MaxObject {
         } else if (s.equals("High") && iNodeType != 3) {
             iNodeType = 3;
         }
-        System.out.println("Head move is " + iNodeType);
+//        System.out.println("Head move is " + iNodeType);
     }
 
     /*Input: boolean -- setAutoBase
@@ -267,6 +271,12 @@ public class NoddingHeadWithTempo extends MaxObject {
     class HeadNod extends TimerTask {
         long lWaitTime;
         public void run() {
+            if (iNodCounter <= 4) {
+                outlet(5, 0.1f);
+            } else {
+                float lookAtPosition = rRandomGen.nextFloat()*1.5f - .75f;
+                outlet(5, lookAtPosition);
+            }
             lWaitTime = (long) (fHeadNodInterval * iNthTimesTempo);
             outlet(iNodeType, fHeadNodInterval * iNthTimesTempo); //1->low, 2->mid, 3->high
             iNodCounter++;

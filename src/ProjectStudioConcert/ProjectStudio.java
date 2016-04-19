@@ -88,7 +88,7 @@ public class ProjectStudio extends MaxObject{
             tHeadControl = new Timer();
             tHeadControl.schedule(new headmoveSection1(), (int)fHeadNodInterval*8); //start head move
             setMetronome(iSection);
-            outlet(15, 1);  //start metronome
+//            outlet(15, 1);  //start metronome
 //            startPlayRhythmPattern();   //start prothetic arm
             System.out.println("We are in section " + iSection + " and play");
         } else if (sec == 38 && iSection != 2) {
@@ -203,7 +203,7 @@ public class ProjectStudio extends MaxObject{
             tTimer2 = new Timer();
             tTimer2.schedule(new ShimonStartPlay(), 0);
             if (iSection == 4) {
-                startPlayRhythmPattern();
+//                startPlayRhythmPattern();
             }
             bShimonIsPlay = true;
 
@@ -227,10 +227,10 @@ public class ProjectStudio extends MaxObject{
                 tHeadControl.schedule(new headMoveSection4(), 500);
                 tBasePanControl.schedule(new startAutoBasePan(), 500 + (int) (16 * fHeadNodInterval));
             }
-            if (iSection != 2) {
-                tMetronome = new Timer();
-                tMetronome.schedule(new startNewMetronome(), 500);
-            }
+//            if (iSection != 2) {
+//                tMetronome = new Timer();
+//                tMetronome.schedule(new startNewMetronome(), 500);
+//            }
         }
     }
 
@@ -406,7 +406,7 @@ public class ProjectStudio extends MaxObject{
                 if (iSection1NodCount < 8) {
                     outlet(10, .8f);
                 } else {
-                    outlet(10, -.8f);
+                    outlet(10, -.2f);
                 }
                 waitTime = (int)fHeadNodInterval;
                 outlet(6, fHeadNodInterval);    //HIP HOP NOD low
@@ -428,7 +428,7 @@ public class ProjectStudio extends MaxObject{
                 if (iSection2NodCount < 4) {
                     outlet(10, 0.8f);
                 } else {
-                    outlet(10, -0.8f);
+                    outlet(10, -0.2f);
                 }
                 waitTime = (int)fHeadNodInterval;
                 outlet(6, fHeadNodInterval);    //HIP HOP NOD low
@@ -446,9 +446,9 @@ public class ProjectStudio extends MaxObject{
         public void run() {
             if (iSection3NodCount <= 16) {
                 if (iSection3NodCount < 8) {
-                    outlet(10, -.7f);
+                    outlet(10, -.2f);
                 } else {
-                    outlet(10, .7f);
+                    outlet(10, .8f);
                 }
             }
             waitTime = (int)fHeadNodInterval;
@@ -465,7 +465,7 @@ public class ProjectStudio extends MaxObject{
                 if (iSection4NodCount < 4) {
                     outlet(10, .7f);
                 } else {
-                    outlet(10, -.7f);
+                    outlet(10, -.2f);
                 }
                 waitTime = (int)fHeadNodInterval;
                 outlet(iShimonHeadMoveHeight, fHeadNodInterval);

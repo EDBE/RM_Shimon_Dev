@@ -7,17 +7,16 @@ package Classical;
 import com.cycling74.max.DataTypes;
 import com.cycling74.max.MaxObject;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 
 public class ConductorGesture2Head extends MaxObject {
     Timer tTimer1 = new Timer();
-    int iNumOfPass = 6;
+    int iNumOfPass = 8;
     int iCurrentNumOfPass = 0;
-    int iNodNum = 6;
+    int iNodNum = 12;
     int iNodCounter = 0;
+    int iNodExtentCounter = 0;
+    int iNodType = 0;
     volatile List<Long> llIntervalBuffer = new ArrayList<Long>(iNumOfPass);
     long lLastTimeStamp, lSecondLastTimeStamp = System.currentTimeMillis();
     long lMoveStartTimeStamp = 0;
@@ -39,6 +38,7 @@ public class ConductorGesture2Head extends MaxObject {
     boolean bIsMoving = false;
     boolean bIsCapturing = false;
     boolean bObjectIsInit = false;
+    boolean bNormalPlay = false;
 
     float fUpperBoundLeftHand = 300.f;
     float fLowerBoundLeftHand = -300.f;
@@ -48,10 +48,12 @@ public class ConductorGesture2Head extends MaxObject {
     float fKeyPointUpperBound = 30.f;
     float fKeyPointLowerBound = -30.f;
 
+    Random rRandGen = new Random();
+
     //Constructor: 2 inlet, 6 outlet mxj object
     public ConductorGesture2Head() {
         declareInlets(new int[]{DataTypes.ALL, DataTypes.ALL});
-        declareOutlets(new int[]{DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL,});
+        declareOutlets(new int[]{DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL,});
         resetAll();
         System.out.println("The ConductorGesture2Head mxj object is updated!");
     }
@@ -185,7 +187,7 @@ public class ConductorGesture2Head extends MaxObject {
     By default: iNodNum = 6
      */
     public void setNumOfShimonResponse(int number) {
-        if (number < 10 && number >=2) {
+        if (number < 16 && number >=2) {
             iNodNum = number;
             System.out.println("Once the tempo detected, Shimon will response with " + iNodNum + " times.");
         }
@@ -273,8 +275,10 @@ public class ConductorGesture2Head extends MaxObject {
         llIntervalBuffer.clear();
         ehCurrentDirection = eHandDirection.ArmRight;
         iCurrentNumOfPass = 0;
+        iNodExtentCounter = 0;
 //        bIsWatching = false;
         bIsValidData = false;
+        bNormalPlay = false;
         lLastTimeStamp = System.currentTimeMillis();
         lSecondLastTimeStamp = System.currentTimeMillis();
     }
@@ -315,17 +319,51 @@ public class ConductorGesture2Head extends MaxObject {
                 hipHopMidNod();
                 iNodCounter++;
                 tTimer1.schedule(new headNod(), waitTime);
-                if (iNodCounter == iNodNum - 1) {
-                    outlet(2, "This set of gesutures is almost finished!");
+                if (iNodCounter == iNodNum / 2) {
+//                    outlet(2, "This set of gesutures is almost finished!");
+                    if (!bNormalPlay) { //start the normal play
+                        outlet(2, "This set of gestures is already completed half");
+                        bNormalPlay = true;
+                    }
                     //set the watching state into false in order to make the synchronization between
                     //watching state and object activation state. This is for dealing with turning off
                     //object during shimon's nodding.
                     bIsWatching = false;
                 }
-            } else if (iNodCounter == iNodNum ) {
-                stopNodHead();
-                iNodCounter = 0;
             }
+//            } else if (iNodCounter == iNodNum ) {
+////                stopNodHead();
+////                iNodCounter = 0;
+            else {
+                waitTime = (int)(fShimonHeadNodInterval * 4);
+                tTimer1.schedule(new headNodExtension(), waitTime);
+            }
+        }
+    }
+
+    class headNodExtension extends TimerTask {
+        public void run() {
+            if (rRandGen.nextFloat() > .7f) {
+                float lookAt = rRandGen.nextFloat() * 1.4f - 0.7f;
+                outlet(3, lookAt);
+            }
+            if (iNodExtentCounter < 8) {
+                outlet(0, (int) fShimonHeadNodInterval);
+            } else {
+                if (rRandGen.nextFloat() > 0.5f) {
+                    float randNum = rRandGen.nextFloat();
+                    if (randNum < .4f) {
+                        iNodType = 5;
+                    } else if (randNum >= .4f && randNum < .85f) {
+                        iNodType = 6;
+                    } else {
+                        iNodType = 0;
+                    }
+                }
+                outlet(iNodType, (int) fShimonHeadNodInterval);
+            }
+            iNodExtentCounter++;
+            tTimer1.schedule(new headNodExtension(), 2*(int)fShimonHeadNodInterval);
         }
     }
 
@@ -333,10 +371,11 @@ public class ConductorGesture2Head extends MaxObject {
         outlet(0, (int)fShimonHeadNodInterval);
     }
 
-    private void stopNodHead() {
+    public void stopNodHead() {
         if (bIsMoving) {
             tTimer1.cancel();
             bIsMoving = false;
         }
+        outlet(3, .0f); //neck pan go to zero position
     }
 }

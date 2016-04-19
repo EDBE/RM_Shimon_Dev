@@ -4,6 +4,7 @@ import com.cycling74.max.Atom;
 import com.cycling74.max.DataTypes;
 import com.cycling74.max.MaxObject;
 
+import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -19,8 +20,6 @@ public class MorningCloud_StructManager extends MaxObject {
     int iPathPlanSection = 1;
     int iSwitchModeMessageCounter = 0;
     int iLocalBPM = 95;
-
-    long lLastTime;
 
     float fGlobalBeat = 0.f;
 
@@ -39,6 +38,10 @@ public class MorningCloud_StructManager extends MaxObject {
     boolean bHumanIsSolo = false;
 
     Timer tSwitchModeTask;
+    Timer tBlinkTrigger;
+    Timer tConductorGestureSwitcher;
+
+    Random rRandGen;
 
     /*
     Constructor: declare the input and output of the object
@@ -70,8 +73,10 @@ public class MorningCloud_StructManager extends MaxObject {
         Output 15:communicate with HeadFollowHead patch (switch On and Off)
          */
         declareInlets(new int[]{DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL});
-        declareOutlets(new int[]{DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL});
-        lLastTime = System.currentTimeMillis();
+        declareOutlets(new int[]{DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL,
+                                DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL,
+                                DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL,
+                                DataTypes.ALL, DataTypes.ALL, DataTypes.ALL, DataTypes.ALL});
 
         System.out.println("MorningCloud_StructManager Object is updated!");
         reset();
@@ -160,7 +165,7 @@ public class MorningCloud_StructManager extends MaxObject {
     public void getScoreLabel(String s) {
         if (!s.equals(sScoreLabel)) {
             sScoreLabel = s;
-            System.out.println("The score label is " + sScoreLabel);
+//            System.out.println("The score label is " + sScoreLabel);
             headFollowHand();   //communicate with head follows hand patch
             normalHeadNod();    //communicate with nodding head patch
             velocityVariation();//communicate with path planning patch
@@ -331,11 +336,11 @@ public class MorningCloud_StructManager extends MaxObject {
         if (iPathPlanSection == 1) {
             if (sScoreLabel.equals("s") || sScoreLabel.equals("measure1")) {
                 HeadFollowHandSwitcher(true);
-            } else if (sScoreLabel.equals("e3")) {
+            } else if (sScoreLabel.equals("e2")) {
                 HeadFollowHandSwitcher(false);
             } else if (sScoreLabel.equals("measure31")) {
                 HeadFollowHandSwitcher(true);
-            } else if (sScoreLabel.equals("e34")) {
+            } else if (sScoreLabel.equals("e32")) {
                 HeadFollowHandSwitcher(false);
             }
         } else {
@@ -371,24 +376,22 @@ public class MorningCloud_StructManager extends MaxObject {
         // turn the normal head nod object ON or OFF
         if (!bHeadIsFollowHand) {
             if (iPathPlanSection == 1) {
-                if (sScoreLabel.equals("e5")) {
+                if (sScoreLabel.equals("e3")) {
                     normalHeadNodSwitcher(true);
                 } else if (sScoreLabel.equals("e30")) {
                     normalHeadNodSwitcher(false);
-                } else if (sScoreLabel.equals("e35")) {
+                } else if (sScoreLabel.equals("e33")) {
                     normalHeadNodSwitcher(true);
                 } else if (sScoreLabel.equals("e38")) {
                     normalHeadNodSwitcher(false);
                 } else if (sScoreLabel.equals("e43")) {
                     normalHeadNodSwitcher(true);
-                } else if (sScoreLabel.equals("e50")) {
+                } else if (sScoreLabel.equals("e53")) {
                     normalHeadNodSwitcher(false);
                 } else if (sScoreLabel.equals("e54")) {
                     normalHeadNodSwitcher(true);
-                } else if (sScoreLabel.equals("e66")) {
+                } else if (sScoreLabel.equals("e67")) {
                     normalHeadNodSwitcher(false);
-                } else if (sScoreLabel.equals("e68")) {
-                    normalHeadNodSwitcher(true);
                 }
             } else if (iPathPlanSection == 2) {
                 if (sScoreLabel.equals("ee2")) {
@@ -496,11 +499,12 @@ public class MorningCloud_StructManager extends MaxObject {
     */
     private void headFollowHead() {
         if (iPathPlanSection == 1) {
-            if (sScoreLabel.equals("e40")) {
+            if (sScoreLabel.equals("e39")) {
                 head2HeadSwitcher(true);
-            } else if (sScoreLabel.equals("e44")) {
-                head2HeadSwitcher(false);
             }
+//            } else if (sScoreLabel.equals("e44")) {
+//                head2HeadSwitcher(false);
+//            }
         }
     }
     /*
@@ -546,16 +550,26 @@ public class MorningCloud_StructManager extends MaxObject {
     make robot blink at particular point
      */
     private void blink() {
-        if (sScoreLabel.equals("s") || sScoreLabel.equals("measure1")) {
-            blinkBig();
-        } else if (sScoreLabel.equals("e15")) {
-            blinkBig();
-        } else if (sScoreLabel.equals("e101")) {
-            blinkOnce();
-        } else if (sScoreLabel.equals("e102")) {
-            blinkBig();
-        } else if (sScoreLabel.equals("e104")) {
-            blinkOnce();
+        if (iPathPlanSection == 1) {
+            if (sScoreLabel.equals("s") || sScoreLabel.equals("measure1")
+                    || sScoreLabel.equals("e15") || sScoreLabel.equals("e102")
+                    || sScoreLabel.equals("e31") || sScoreLabel.equals("e45")
+                    || sScoreLabel.equals("e54") ) {
+                blinkBig1();
+            } else if (sScoreLabel.equals("e8") || sScoreLabel.equals("e10")
+                    || sScoreLabel.equals("e20") || sScoreLabel.equals("e101")
+                    || sScoreLabel.equals("e104") || sScoreLabel.equals("e23")
+                    || sScoreLabel.equals("e30") || sScoreLabel.equals("e36")
+                    || sScoreLabel.equals("e38") || sScoreLabel.equals("e51")
+                    || sScoreLabel.equals("e65")) {
+                blinkOnce();
+            } else if (sScoreLabel.equals("")) {
+                blinkBig2();
+            }
+        } else {
+            if (sScoreLabel.equals("ee3")) {
+                blinkBig2();
+            }
         }
     }
     /*
@@ -567,8 +581,30 @@ public class MorningCloud_StructManager extends MaxObject {
     /*
     blinking: robot blink with higher amplitude
      */
-    private void blinkBig() {
+    private void blinkBig1() {
         outlet(13, "/FastBlink1");
+    }
+    /*
+    blinking: robot blink with higher amplitude (similar idea but different outcome)
+     */
+    private void blinkBig2() {
+        outlet(13, "/FastBlink2");
+    }
+    /*
+    In Shimon solo part, blink will be triggered periodically in order to inform the beat
+     */
+    private void blinkPeriod() {
+        tBlinkTrigger = new Timer();
+        rRandGen = new Random();
+        tBlinkTrigger.schedule(new blinkPeriodically(), 500);   //offset the arm delay
+    }
+    /*
+    Stop the periodic blink
+     */
+    public void stopBlinkPeriod() {
+        if (tBlinkTrigger != null) {
+            tBlinkTrigger.cancel();
+        }
     }
     /*
     neck pan control: slowly or quickly look to the left or right
@@ -627,8 +663,12 @@ public class MorningCloud_StructManager extends MaxObject {
                 tSwitchModeTask.cancel();
                 System.out.println("Path Planing OFF");
 //                outlet(10, "start");      //using 'detonate' to play back midi
-                outlet(10, "start 1024");   //using 'seq' object to play back midi
-                System.out.println("Shimon starts to solo");
+//                outlet(10, "start 1024");   //using 'seq' object to play back midi
+                blinkPeriod();
+                lookAtMe(); //Shimon look at human
+                tConductorGestureSwitcher = new Timer();
+                tConductorGestureSwitcher.schedule(new startConductorGesture(), 500);
+                System.out.println("Shimon starts to wait and watch conductor gesture!");
                 iSwitchModeMessageCounter = 0;
             } else {
                 tSwitchModeTask.schedule(new SwitchModeOn2Off(), waitTime);
@@ -661,6 +701,32 @@ public class MorningCloud_StructManager extends MaxObject {
                 tSwitchModeTask.schedule(new SwitchModeOff2On(), waitTime);
                 iSwitchModeMessageCounter++;
             }
+        }
+    }
+    class blinkPeriodically extends TimerTask {
+        public void run() {
+            float randomValue = rRandGen.nextFloat();
+            if (randomValue > .2f) {
+                float randomValue2 = rRandGen.nextFloat();
+                if (randomValue2 > .8f) {
+                    blinkBig1();
+                } else if (randomValue2 > .6f) {
+                    blinkBig2();
+                } else {
+                    blinkOnce();
+                }
+            }
+            tBlinkTrigger.schedule(new blinkPeriodically(), 3333);  //assume Shimon solo is 72 BPM
+        }
+    }
+    class startConductorGesture extends TimerTask {
+        public void run() {
+            outlet(17, 1);
+        }
+    }
+    class stopConductorGesture extends TimerTask {
+        public void run() {
+            outlet(17, 0);
         }
     }
 }

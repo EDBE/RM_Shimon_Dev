@@ -240,23 +240,23 @@ public class PlayPlanned extends MaxObject{
 
     public void velocityControl(String s) {
         if (s.equals("low")) {
-            iArm0Vel = 40;
-            iArm1Vel = 70;
-            iArm2Vel = 40;
-            iArm3Vel = 60;
-            System.out.println("playing softly");
-        } else if(s.equals("mid")) {
             iArm0Vel = 50;
-            iArm1Vel = 80;
+            iArm1Vel = 50;
             iArm2Vel = 50;
-            iArm3Vel = 70;
-            System.out.println("playing mid");
+            iArm3Vel = 50;
+//            System.out.println("playing softly");
+        } else if(s.equals("mid")) {
+            iArm0Vel = 65;
+            iArm1Vel = 65;
+            iArm2Vel = 65;
+            iArm3Vel = 65;
+//            System.out.println("playing mid");
         } else if(s.equals("high")) {
-            iArm0Vel = 60;
-            iArm1Vel = 100;
-            iArm2Vel = 70;
+            iArm0Vel = 80;
+            iArm1Vel = 80;
+            iArm2Vel = 80;
             iArm3Vel = 80;
-            System.out.println("playing strongly");
+//            System.out.println("playing strongly");
         } else {
             //
         }
