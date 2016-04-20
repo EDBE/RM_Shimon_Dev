@@ -11,7 +11,7 @@ import java.util.*;
 
 public class ConductorGesture2Head extends MaxObject {
     Timer tTimer1 = new Timer();
-    int iNumOfPass = 8;
+    int iNumOfPass = 4;
     int iCurrentNumOfPass = 0;
     int iNodNum = 12;
     int iNodCounter = 0;
@@ -228,6 +228,7 @@ public class ConductorGesture2Head extends MaxObject {
                 bIsMoving = true;
                 lMoveStartTimeStamp = System.currentTimeMillis();
                 System.out.println("Tempo is detected!");
+                outlet(7, 0);
                 //after 500 ms, Shimon starts to move
                 startHeadMove((int) fShimonHeadNodInterval / 2);
                 resetAll();

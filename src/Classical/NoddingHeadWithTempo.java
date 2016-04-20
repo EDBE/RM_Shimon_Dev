@@ -119,7 +119,7 @@ public class NoddingHeadWithTempo extends MaxObject {
                 lfRealtimeTempo.clear();
             }
             iNodCounter = 0;    //counter reset
-            outlet(5, .0f);     // neck pan to 0 position
+            outlet(5, 0.f);     // neck pan to 0 position
             System.out.println("HeadNodding object is OFF!!!");
         }
         outlet(0, bObjectOnOff);
@@ -278,7 +278,7 @@ public class NoddingHeadWithTempo extends MaxObject {
                 outlet(5, lookAtPosition);
             }
             lWaitTime = (long) (fHeadNodInterval * iNthTimesTempo);
-            outlet(iNodeType, fHeadNodInterval * iNthTimesTempo); //1->low, 2->mid, 3->high
+            outlet(iNodeType, (int)fHeadNodInterval * iNthTimesTempo); //1->low, 2->mid, 3->high
             iNodCounter++;
             tHeadTempoMoving.schedule(new HeadNod(), lWaitTime);
         }

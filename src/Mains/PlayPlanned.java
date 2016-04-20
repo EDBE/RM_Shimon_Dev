@@ -240,10 +240,10 @@ public class PlayPlanned extends MaxObject{
 
     public void velocityControl(String s) {
         if (s.equals("low")) {
-            iArm0Vel = 50;
-            iArm1Vel = 50;
-            iArm2Vel = 50;
-            iArm3Vel = 50;
+            iArm0Vel = 48;
+            iArm1Vel = 48;
+            iArm2Vel = 48;
+            iArm3Vel = 48;
 //            System.out.println("playing softly");
         } else if(s.equals("mid")) {
             iArm0Vel = 65;

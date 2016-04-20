@@ -430,9 +430,10 @@ public class MorningCloud_StructManager extends MaxObject {
                 normalHeadNodBasePan(0);
             } else if (sScoreLabel.equals("e66")) {
                 normalHeadNodBasePan(1);
-            } else if (sScoreLabel.equals("e68")) {
-                normalHeadNodBasePan(0);
             }
+//            else if (sScoreLabel.equals("e68")) {
+//                normalHeadNodBasePan(0);
+//            }
         } else if (iPathPlanSection == 2) {
             if (sScoreLabel.equals("ee2")) {
                 normalHeadNodBasePan(1);
@@ -663,7 +664,7 @@ public class MorningCloud_StructManager extends MaxObject {
                 tSwitchModeTask.cancel();
                 System.out.println("Path Planing OFF");
 //                outlet(10, "start");      //using 'detonate' to play back midi
-//                outlet(10, "start 1024");   //using 'seq' object to play back midi
+                outlet(10, "start 1024");   //using 'seq' object to play back midi
                 blinkPeriod();
                 lookAtMe(); //Shimon look at human
                 tConductorGestureSwitcher = new Timer();
