@@ -243,19 +243,19 @@ public class PlayPlanned extends MaxObject{
             iArm0Vel = 48;
             iArm1Vel = 48;
             iArm2Vel = 48;
-            iArm3Vel = 48;
+            iArm3Vel = 45;
 //            System.out.println("playing softly");
         } else if(s.equals("mid")) {
             iArm0Vel = 65;
             iArm1Vel = 65;
             iArm2Vel = 65;
-            iArm3Vel = 65;
+            iArm3Vel = 61;
 //            System.out.println("playing mid");
         } else if(s.equals("high")) {
             iArm0Vel = 80;
             iArm1Vel = 80;
             iArm2Vel = 80;
-            iArm3Vel = 80;
+            iArm3Vel = 75;
 //            System.out.println("playing strongly");
         } else {
             //

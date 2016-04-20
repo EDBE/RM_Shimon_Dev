@@ -33,15 +33,16 @@ public class MorningCloud_StructManager extends MaxObject {
     boolean bHeadIsFollowHand = false;
     boolean bHeadIsNormalNod = false;
     boolean bIsAutoBasePan = false;
-    boolean bHeadIsSpecialMove = false;
     boolean bHeadIsFollowHead = false;
     boolean bHumanIsSolo = false;
 
     Timer tSwitchModeTask;
     Timer tBlinkTrigger;
     Timer tConductorGestureSwitcher;
+    Timer tEnergyMappingSwitcher;
 
     Random rRandGen;
+    Random rRandGen2;
 
     /*
     Constructor: declare the input and output of the object
@@ -319,11 +320,17 @@ public class MorningCloud_StructManager extends MaxObject {
     when receive the ending signal from Human solo part, ends this function
      */
     public void setbHumanIsSolo(int switcher) {
+        rRandGen2 = new Random();
         if (!bHumanIsSolo && switcher == 1) {
             bHumanIsSolo = true;
-            outlet(16, 1);
+//            outlet(16, 1);
+            tEnergyMappingSwitcher = new Timer();
+            tEnergyMappingSwitcher.schedule(new startEnergyMapping(), 500);
         } else if (bHumanIsSolo && switcher == 0) {
             bHumanIsSolo = false;
+            if (tEnergyMappingSwitcher != null) {
+                tEnergyMappingSwitcher.cancel();
+            }
             outlet(16, 0);
         }
     }
@@ -627,10 +634,16 @@ public class MorningCloud_StructManager extends MaxObject {
     using neck pan at particular points in the piece
      */
     private void neckMove() {
-        if (sScoreLabel.equals("measure1") || sScoreLabel.equals("s")) {
-            lookAtMe();
-        } else if (sScoreLabel.equals("measure19")) {
-            neckPanCtl("right", 0.1f, 6.f);
+        if (iPathPlanSection == 1) {
+            if (sScoreLabel.equals("measure1") || sScoreLabel.equals("s")) {
+                lookAtMe();
+            } else if (sScoreLabel.equals("measure19")) {
+                neckPanCtl("right", 0.1f, 6.f);
+            }
+        } else {
+            if (sScoreLabel.equals("ee1")) {
+                lookAtMe();
+            }
         }
     }
     /*
@@ -728,6 +741,14 @@ public class MorningCloud_StructManager extends MaxObject {
     class stopConductorGesture extends TimerTask {
         public void run() {
             outlet(17, 0);
+        }
+    }
+    class startEnergyMapping extends TimerTask {
+        long waitTime = 10000;
+        public void run() {
+            int randValue = rRandGen2.nextInt(2) + 1;
+            outlet(16, randValue);
+            tEnergyMappingSwitcher.schedule(new startEnergyMapping(), waitTime);
         }
     }
 }
