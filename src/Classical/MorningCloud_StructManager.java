@@ -154,10 +154,11 @@ public class MorningCloud_StructManager extends MaxObject {
 //                    System.out.println("I am getting value of " + iRealTimeTempo + " from " + inletIdx);
                 }
             }
-        } else if (inletIdx == 4) {
-            fGlobalBeat = f;
-//            System.out.println("I am getting value of " + fGlobalBeat + " from " + inletIdx);
         }
+//else if (inletIdx == 4) {
+//            fGlobalBeat = f;
+////            System.out.println("I am getting value of " + fGlobalBeat + " from " + inletIdx);
+//        }
     }
 
     /*
@@ -262,7 +263,7 @@ public class MorningCloud_StructManager extends MaxObject {
     private void pathPlanOff() {
         if (bIsPathPlaning) {
             tSwitchModeTask = new Timer();
-            tSwitchModeTask.schedule(new SwitchModeOn2Off(), 2500);
+            tSwitchModeTask.schedule(new SwitchModeOn2Off(), 3500);
         }
     }
     private void pathPlanOn() {
@@ -353,7 +354,7 @@ public class MorningCloud_StructManager extends MaxObject {
         } else {
             if (sScoreLabel.equals("ee20")) {
                 HeadFollowHandSwitcher(true);
-            } else if (sScoreLabel.equals("ee21")) {
+            } else if (sScoreLabel.equals("ee23")) {
                 HeadFollowHandSwitcher(false);
             } else if (sScoreLabel.equals("ee46")) {
                 HeadFollowHandSwitcher(true);
@@ -393,25 +394,29 @@ public class MorningCloud_StructManager extends MaxObject {
                     normalHeadNodSwitcher(false);
                 } else if (sScoreLabel.equals("e43")) {
                     normalHeadNodSwitcher(true);
-                } else if (sScoreLabel.equals("e53")) {
-                    normalHeadNodSwitcher(false);
-                } else if (sScoreLabel.equals("e54")) {
-                    normalHeadNodSwitcher(true);
-                } else if (sScoreLabel.equals("e67")) {
+                }
+//                else if (sScoreLabel.equals("e53")) {
+//                    normalHeadNodSwitcher(false);
+//                } else if (sScoreLabel.equals("e54")) {
+//                    normalHeadNodSwitcher(true);
+//                }
+                else if (sScoreLabel.equals("e67")) {
                     normalHeadNodSwitcher(false);
                 }
             } else if (iPathPlanSection == 2) {
                 if (sScoreLabel.equals("ee2")) {
                     normalHeadNodSwitcher(true);
-                } else if (sScoreLabel.equals("ee9")) {
-                    normalHeadNodSwitcher(false);
-                } else if (sScoreLabel.equals("ee22")) {
-                    normalHeadNodSwitcher(true);
-                } else if (sScoreLabel.equals("ee29")) {
-                    normalHeadNodSwitcher(false);
-                } else if (sScoreLabel.equals("ee43")) {
-                    normalHeadNodSwitcher(true);
-                } else if (sScoreLabel.equals("ee45")) {
+                }
+//                else if (sScoreLabel.equals("ee9")) {
+//                    normalHeadNodSwitcher(false);
+//                } else if (sScoreLabel.equals("ee22")) {
+//                    normalHeadNodSwitcher(true);
+//                } else if (sScoreLabel.equals("ee29")) {
+//                    normalHeadNodSwitcher(false);
+//                } else if (sScoreLabel.equals("ee43")) {
+//                    normalHeadNodSwitcher(true);
+//                }
+                else if (sScoreLabel.equals("ee45")) {
                     normalHeadNodSwitcher(false);
                 }
             }
@@ -744,10 +749,14 @@ public class MorningCloud_StructManager extends MaxObject {
         }
     }
     class startEnergyMapping extends TimerTask {
-        long waitTime = 10000;
+        long waitTime = 6000;
         public void run() {
-            int randValue = rRandGen2.nextInt(2) + 1;
-            outlet(16, randValue);
+            float randValue = rRandGen2.nextFloat();
+            if (randValue < .65f) {
+                outlet(16, 2);      //look at right hand (try right elbow)
+            } else {
+                outlet(16, 1);      //look at head
+            }
             tEnergyMappingSwitcher.schedule(new startEnergyMapping(), waitTime);
         }
     }

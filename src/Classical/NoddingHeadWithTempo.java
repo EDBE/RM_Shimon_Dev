@@ -216,7 +216,7 @@ public class NoddingHeadWithTempo extends MaxObject {
                     iNumOfInputNote++;
                 } else {
                     fHeadNodInterval = intervalCalculation(smoothedTempo(lfRealtimeTempo, iNumOfNoteObserve));
-                    System.out.println("The interval of nodding is " + fHeadNodInterval);
+//                    System.out.println("The interval of nodding is " + fHeadNodInterval);
                     iNumOfInputNote = 0;
                     bNewNodIntervalReady = true;
                 }
