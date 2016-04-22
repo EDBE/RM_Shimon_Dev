@@ -352,9 +352,9 @@ public class MorningCloud_StructManager extends MaxObject {
                 HeadFollowHandSwitcher(false);
             }
         } else {
-            if (sScoreLabel.equals("ee20")) {
+            if (sScoreLabel.equals("ee12")) {
                 HeadFollowHandSwitcher(true);
-            } else if (sScoreLabel.equals("ee23")) {
+            } else if (sScoreLabel.equals("ee21")) {
                 HeadFollowHandSwitcher(false);
             } else if (sScoreLabel.equals("ee46")) {
                 HeadFollowHandSwitcher(true);
@@ -390,9 +390,9 @@ public class MorningCloud_StructManager extends MaxObject {
                     normalHeadNodSwitcher(false);
                 } else if (sScoreLabel.equals("e33")) {
                     normalHeadNodSwitcher(true);
-                } else if (sScoreLabel.equals("e38")) {
+                } else if (sScoreLabel.equals("e42")) {
                     normalHeadNodSwitcher(false);
-                } else if (sScoreLabel.equals("e43")) {
+                } else if (sScoreLabel.equals("e45")) {
                     normalHeadNodSwitcher(true);
                 }
 //                else if (sScoreLabel.equals("e53")) {
@@ -407,11 +407,12 @@ public class MorningCloud_StructManager extends MaxObject {
                 if (sScoreLabel.equals("ee2")) {
                     normalHeadNodSwitcher(true);
                 }
-//                else if (sScoreLabel.equals("ee9")) {
-//                    normalHeadNodSwitcher(false);
-//                } else if (sScoreLabel.equals("ee22")) {
-//                    normalHeadNodSwitcher(true);
-//                } else if (sScoreLabel.equals("ee29")) {
+                else if (sScoreLabel.equals("ee11")) {
+                    normalHeadNodSwitcher(false);
+                } else if (sScoreLabel.equals("ee22")) {
+                    normalHeadNodSwitcher(true);
+                }
+// else if (sScoreLabel.equals("ee29")) {
 //                    normalHeadNodSwitcher(false);
 //                } else if (sScoreLabel.equals("ee43")) {
 //                    normalHeadNodSwitcher(true);
@@ -512,7 +513,7 @@ public class MorningCloud_StructManager extends MaxObject {
     */
     private void headFollowHead() {
         if (iPathPlanSection == 1) {
-            if (sScoreLabel.equals("e39")) {
+            if (sScoreLabel.equals("e43")) {
                 head2HeadSwitcher(true);
             }
 //            } else if (sScoreLabel.equals("e44")) {

@@ -345,7 +345,7 @@ public class ConductorGesture2Head extends MaxObject {
     class headNodExtension extends TimerTask {
         public void run() {
             if (rRandGen.nextFloat() > .7f) {
-                float lookAt = rRandGen.nextFloat() * 1.4f - 0.7f;
+                float lookAt = rRandGen.nextFloat() * 1.3f - 0.65f;
                 outlet(3, lookAt);
             }
             if (iNodExtentCounter < 8) {
