@@ -515,10 +515,18 @@ public class MorningCloud_StructManager extends MaxObject {
         if (iPathPlanSection == 1) {
             if (sScoreLabel.equals("e43")) {
                 head2HeadSwitcher(true);
+            } else if (sScoreLabel.equals("e44")) {
+                head2HeadSwitcher(false);
             }
 //            } else if (sScoreLabel.equals("e44")) {
 //                head2HeadSwitcher(false);
 //            }
+        } else if (iPathPlanSection == 2) {
+            if (sScoreLabel.equals("ee28")) {
+                head2HeadSwitcher(true);
+            } else if (sScoreLabel.equals("ee29")) {
+                head2HeadSwitcher(false);
+            }
         }
     }
     /*
@@ -683,7 +691,7 @@ public class MorningCloud_StructManager extends MaxObject {
                 tSwitchModeTask.cancel();
                 System.out.println("Path Planing OFF");
 //                outlet(10, "start");      //using 'detonate' to play back midi
-                outlet(10, "start 1024");   //using 'seq' object to play back midi
+                outlet(10, "start -1");   //using 'seq' object to play back midi
                 blinkPeriod();
                 lookAtMe(); //Shimon look at human
                 tConductorGestureSwitcher = new Timer();
@@ -753,7 +761,7 @@ public class MorningCloud_StructManager extends MaxObject {
         long waitTime = 6000;
         public void run() {
             float randValue = rRandGen2.nextFloat();
-            if (randValue < .65f) {
+            if (randValue < .5f) {
                 outlet(16, 2);      //look at right hand (try right elbow)
             } else {
                 outlet(16, 1);      //look at head

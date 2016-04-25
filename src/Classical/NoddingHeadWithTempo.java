@@ -274,7 +274,7 @@ public class NoddingHeadWithTempo extends MaxObject {
             if (iNodCounter <= 4) {
                 outlet(5, 0.1f);
             } else {
-                float lookAtPosition = rRandomGen.nextFloat()*1.3f - .7f;
+                float lookAtPosition = rRandomGen.nextFloat()*1.15f - .7f;
                 outlet(5, lookAtPosition);
             }
             lWaitTime = (long) (fHeadNodInterval * iNthTimesTempo);
